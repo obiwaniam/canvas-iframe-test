@@ -568,6 +568,152 @@
     margin-top: 0.15rem;
     line-height: 1.4;
   }
+  .batch2-nav {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.5rem;
+    margin-top: 0.55rem;
+    margin-bottom: 0.55rem;
+  }
+  .batch2-nav-btn {
+    border: 2px solid var(--border);
+    background: #fff;
+    border-radius: 10px;
+    padding: 0.55rem 0.45rem;
+    font-size: 0.76rem;
+    font-weight: 700;
+    color: var(--text);
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .batch2-nav-btn:hover { border-color: var(--primary-light); }
+  .batch2-nav-btn.active {
+    border-color: var(--primary);
+    background: linear-gradient(135deg, var(--primary), #2A6F97);
+    color: #fff;
+  }
+  .batch2-panel {
+    display: none;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    background: #fff;
+    padding: 0.7rem;
+  }
+  .batch2-panel.active { display: block; }
+  .mini-stats {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 0.6rem;
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    margin-bottom: 0.5rem;
+  }
+  .mini-stats strong { color: var(--primary); }
+  .blaster-prompt {
+    font-size: 0.78rem;
+    color: var(--primary);
+    font-weight: 700;
+    margin-bottom: 0.45rem;
+  }
+  .blaster-area {
+    position: relative;
+    height: 210px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: linear-gradient(180deg, #F8FBFF 0%, #EEF6FF 100%);
+    overflow: hidden;
+  }
+  .blaster-target {
+    position: absolute;
+    border: 1px solid var(--primary-light);
+    border-radius: 999px;
+    background: #fff;
+    color: var(--primary);
+    font-size: 0.7rem;
+    font-weight: 700;
+    padding: 0.35rem 0.5rem;
+    cursor: pointer;
+    white-space: nowrap;
+    animation: driftLeft linear forwards;
+  }
+  .blaster-target.correct-hit {
+    background: var(--success-light);
+    border-color: var(--success);
+    color: var(--success);
+  }
+  .blaster-target.wrong-hit {
+    background: #FEF2F0;
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+  @keyframes driftLeft {
+    from { transform: translateX(0); opacity: 1; }
+    to { transform: translateX(-128%); opacity: 0.25; }
+  }
+  .mini-feedback {
+    min-height: 1.2em;
+    font-size: 0.74rem;
+    margin-top: 0.45rem;
+    color: var(--text-muted);
+  }
+  .sort-prompt {
+    font-size: 0.74rem;
+    color: var(--text-muted);
+    margin-bottom: 0.5rem;
+  }
+  .incoming-card {
+    border: 1px solid var(--primary-light);
+    border-radius: 8px;
+    background: #F8FBFF;
+    padding: 0.65rem;
+    text-align: center;
+    margin-bottom: 0.55rem;
+  }
+  .incoming-label {
+    font-size: 0.66rem;
+    color: var(--text-muted);
+    margin-bottom: 0.15rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+  .incoming-term {
+    font-size: 0.95rem;
+    font-weight: 800;
+    color: var(--primary);
+  }
+  .sort-bins {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.4rem;
+  }
+  .sort-bin-btn {
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: #fff;
+    color: var(--text);
+    padding: 0.45rem 0.4rem;
+    font-size: 0.7rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .sort-bin-btn:hover {
+    border-color: var(--primary-light);
+    transform: translateY(-1px);
+  }
+  .mini-complete {
+    margin-top: 0.55rem;
+    border-radius: 8px;
+    background: linear-gradient(135deg, var(--success), #38B2AC);
+    color: #fff;
+    font-size: 0.74rem;
+    font-weight: 700;
+    padding: 0.5rem 0.6rem;
+    text-align: center;
+    display: none;
+  }
+  .mini-complete.show { display: block; }
 
   /* === FOOTER === */
   .footer {
@@ -718,26 +864,48 @@
   </div>
 
   <div class="content-block">
-    <h2>Batch 2 Preview (Next Section)</h2>
-    <p>Below is the scaffold for the second game set. We can keep regular lecture text between batches, then launch the next three activities without changing your Canvas iframe embed.</p>
-    <div class="batch2-grid">
-      <div class="batch2-card">
-        <span class="emoji">🧩</span>
-        <div class="title">Case Sort</div>
-        <div class="sub">Drag clues into the correct system bucket.</div>
-      </div>
-      <div class="batch2-card">
-        <span class="emoji">⚡</span>
-        <div class="title">Rapid Recall</div>
-        <div class="sub">Short timed prompts with streak scoring.</div>
-      </div>
-      <div class="batch2-card">
-        <span class="emoji">🧪</span>
-        <div class="title">Applied Mini-Scenario</div>
-        <div class="sub">Choose the best explanation in context.</div>
-      </div>
+    <h2>Batch 2 Arcade Practice</h2>
+    <p>New game set added below. Play either mode for a quick pre-quiz warm-up, then switch to the other without leaving the page.</p>
+    <div class="batch2-nav">
+      <button class="batch2-nav-btn active" id="b2nav0" onclick="switchBatch2Game(0)">🎯 Target Blaster</button>
+      <button class="batch2-nav-btn" id="b2nav1" onclick="switchBatch2Game(1)">☄️ Asteroid Sort</button>
     </div>
-    <p style="margin-top:0.55rem;">When you’re ready, we’ll implement these one by one in this section.</p>
+
+    <div class="batch2-panel active" id="batch2game0">
+      <div class="mini-stats">
+        <span>Round <strong id="blasterRound">1</strong>/6</span>
+        <span>Score <strong id="blasterScore">0</strong></span>
+      </div>
+      <div class="blaster-prompt" id="blasterPrompt">Loading prompt...</div>
+      <div class="blaster-area" id="blasterArea"></div>
+      <div class="mini-feedback" id="blasterFeedback">Hit the term that matches the clue.</div>
+      <div style="margin-top:0.45rem; text-align:center;">
+        <button class="btn btn-ghost" onclick="initBlaster()">🔄 New Run</button>
+      </div>
+      <div class="mini-complete" id="blasterComplete"></div>
+    </div>
+
+    <div class="batch2-panel" id="batch2game1">
+      <div class="mini-stats">
+        <span>Item <strong id="sortRound">1</strong>/10</span>
+        <span>Correct <strong id="sortScore">0</strong></span>
+      </div>
+      <div class="sort-prompt">Classify the incoming term into the correct category:</div>
+      <div class="incoming-card">
+        <div class="incoming-label">Incoming Term</div>
+        <div class="incoming-term" id="sortTerm">Loading...</div>
+      </div>
+      <div class="sort-bins">
+        <button class="sort-bin-btn" onclick="submitSort('Bone')">🦴 Bone</button>
+        <button class="sort-bin-btn" onclick="submitSort('Muscle')">💪 Muscle</button>
+        <button class="sort-bin-btn" onclick="submitSort('Connective')">🔗 Connective</button>
+      </div>
+      <div class="mini-feedback" id="sortFeedback">Choose the best fit category.</div>
+      <div style="margin-top:0.45rem; text-align:center;">
+        <button class="btn btn-ghost" onclick="initSort()">🔄 New Run</button>
+      </div>
+      <div class="mini-complete" id="sortComplete"></div>
+    </div>
   </div>
 
   <div class="footer">A&P Study Break — Pure HTML/CSS/JS • Embeddable via iframe in Canvas LMS</div>
@@ -759,6 +927,15 @@ document.getElementById('studentName').textContent = `👋 ${studentName}`;
 // ==========================================
 let gamesComplete = [false, false, false];
 const completionCodes = ['FEMUR42', 'DELTOID7', 'TENDON99'];
+
+function shuffleArray(items) {
+  const arr = [...items];
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
+}
 
 function switchGame(idx) {
   document.querySelectorAll('.game-panel').forEach((p,i) => {
@@ -1258,11 +1435,152 @@ function checkScramble() {
 }
 
 // ==========================================
+// BATCH 2: ARCADE PRACTICE
+// ==========================================
+const blasterBank = [
+  { clue: 'Connects bone to bone at a joint', answer: 'Ligament' },
+  { clue: 'Longest bone in the body', answer: 'Femur' },
+  { clue: 'Primary muscle of breathing', answer: 'Diaphragm' },
+  { clue: 'Connects muscle to bone', answer: 'Tendon' },
+  { clue: 'Kneecap bone', answer: 'Patella' },
+  { clue: 'Muscle that flexes the forearm', answer: 'Biceps Brachii' },
+];
+let blasterOrder = [], blasterIdx = 0, blasterScore = 0;
+
+function switchBatch2Game(idx) {
+  document.querySelectorAll('.batch2-panel').forEach((p, i) => {
+    p.classList.toggle('active', i === idx);
+  });
+  document.querySelectorAll('.batch2-nav-btn').forEach((b, i) => {
+    b.classList.toggle('active', i === idx);
+  });
+}
+
+function initBlaster() {
+  blasterOrder = shuffleArray(blasterBank);
+  blasterIdx = 0;
+  blasterScore = 0;
+  document.getElementById('blasterScore').textContent = '0';
+  document.getElementById('blasterFeedback').textContent = 'Hit the term that matches the clue.';
+  document.getElementById('blasterComplete').classList.remove('show');
+  loadBlasterRound();
+}
+
+function randomDecoys(correct, count) {
+  const pool = blasterBank.map(item => item.answer).filter(term => term !== correct);
+  return shuffleArray(pool).slice(0, count);
+}
+
+function loadBlasterRound() {
+  if (blasterIdx >= blasterOrder.length) {
+    const done = document.getElementById('blasterComplete');
+    done.textContent = `Nice run! Final score: ${blasterScore}/${blasterOrder.length}`;
+    done.classList.add('show');
+    document.getElementById('blasterRound').textContent = blasterOrder.length;
+    document.getElementById('blasterPrompt').textContent = 'All prompts complete. Start a new run to replay.';
+    document.getElementById('blasterArea').innerHTML = '';
+    return;
+  }
+
+  const current = blasterOrder[blasterIdx];
+  document.getElementById('blasterPrompt').textContent = `🎯 ${current.clue}`;
+  document.getElementById('blasterRound').textContent = (blasterIdx + 1).toString();
+  const area = document.getElementById('blasterArea');
+  area.innerHTML = '';
+
+  const options = shuffleArray([current.answer, ...randomDecoys(current.answer, 5)]);
+  options.forEach((term, idx) => {
+    const btn = document.createElement('button');
+    btn.className = 'blaster-target';
+    btn.textContent = term;
+    btn.style.right = '-18%';
+    btn.style.top = (12 + idx * 31) + 'px';
+    btn.style.animationDuration = (6 + Math.random() * 3).toFixed(2) + 's';
+    btn.style.animationDelay = (Math.random() * 0.35).toFixed(2) + 's';
+    btn.addEventListener('click', () => hitTarget(btn, term));
+    area.appendChild(btn);
+  });
+}
+
+function hitTarget(btn, term) {
+  const current = blasterOrder[blasterIdx];
+  const allTargets = document.querySelectorAll('.blaster-target');
+  allTargets.forEach(t => t.disabled = true);
+
+  if (term === current.answer) {
+    btn.classList.add('correct-hit');
+    blasterScore++;
+    document.getElementById('blasterScore').textContent = blasterScore.toString();
+    document.getElementById('blasterFeedback').textContent = `✅ Correct: ${term}`;
+    blasterIdx++;
+    setTimeout(loadBlasterRound, 650);
+  } else {
+    btn.classList.add('wrong-hit');
+    document.getElementById('blasterFeedback').textContent = `❌ Not quite. Correct target: ${current.answer}`;
+    setTimeout(loadBlasterRound, 850);
+  }
+}
+
+const sortItems = [
+  { term: 'Scapula', category: 'Bone' },
+  { term: 'Sternum', category: 'Bone' },
+  { term: 'Quadriceps', category: 'Muscle' },
+  { term: 'Deltoid', category: 'Muscle' },
+  { term: 'Gastrocnemius', category: 'Muscle' },
+  { term: 'Femur', category: 'Bone' },
+  { term: 'Patella', category: 'Bone' },
+  { term: 'Tendon', category: 'Connective' },
+  { term: 'Ligament', category: 'Connective' },
+  { term: 'Cartilage', category: 'Connective' },
+];
+let sortQueue = [], sortIdx = 0, sortScore = 0;
+
+function initSort() {
+  sortQueue = shuffleArray(sortItems);
+  sortIdx = 0;
+  sortScore = 0;
+  document.getElementById('sortScore').textContent = '0';
+  document.getElementById('sortFeedback').textContent = 'Choose the best fit category.';
+  document.getElementById('sortComplete').classList.remove('show');
+  loadSortItem();
+}
+
+function loadSortItem() {
+  if (sortIdx >= sortQueue.length) {
+    document.getElementById('sortTerm').textContent = 'Run complete!';
+    document.getElementById('sortRound').textContent = sortQueue.length.toString();
+    const done = document.getElementById('sortComplete');
+    done.textContent = `Sorted ${sortScore}/${sortQueue.length} correctly.`;
+    done.classList.add('show');
+    return;
+  }
+  const current = sortQueue[sortIdx];
+  document.getElementById('sortTerm').textContent = current.term;
+  document.getElementById('sortRound').textContent = (sortIdx + 1).toString();
+}
+
+function submitSort(category) {
+  if (sortIdx >= sortQueue.length) return;
+  const current = sortQueue[sortIdx];
+  if (category === current.category) {
+    sortScore++;
+    document.getElementById('sortScore').textContent = sortScore.toString();
+    document.getElementById('sortFeedback').textContent = `✅ ${current.term} belongs to ${current.category}.`;
+  } else {
+    document.getElementById('sortFeedback').textContent = `❌ ${current.term} is ${current.category}, not ${category}.`;
+  }
+  sortIdx++;
+  setTimeout(loadSortItem, 450);
+}
+
+// ==========================================
 // INIT
 // ==========================================
 initMemory();
 initConnect();
 initScramble();
+initBlaster();
+initSort();
 </script>
 </body>
 </html>

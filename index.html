@@ -648,8 +648,8 @@
     color: var(--accent);
   }
   @keyframes driftLeft {
-    from { transform: translateX(0); opacity: 1; }
-    to { transform: translateX(-128%); opacity: 0.25; }
+    from { left: 102%; opacity: 1; }
+    to { left: -42%; opacity: 0.2; }
   }
   .mini-feedback {
     min-height: 1.2em;
@@ -1516,7 +1516,7 @@ function loadBlasterRound() {
     const btn = document.createElement('button');
     btn.className = 'blaster-target';
     btn.textContent = term;
-    btn.style.right = '-18%';
+    btn.style.left = '102%';
     btn.style.top = (12 + idx * 31) + 'px';
     btn.style.animationDuration = (3.1 + Math.random() * 1.4).toFixed(2) + 's';
     btn.style.animationDelay = (Math.random() * 0.35).toFixed(2) + 's';

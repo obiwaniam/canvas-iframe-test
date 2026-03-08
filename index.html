@@ -734,6 +734,78 @@
     display: none;
   }
   .mini-complete.show { display: block; }
+  .cw-wrap {
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 0.7rem;
+    background: #fff;
+  }
+  .cw-grid {
+    display: grid;
+    grid-template-columns: repeat(9, 32px);
+    gap: 3px;
+    justify-content: center;
+    margin-bottom: 0.6rem;
+  }
+  .cw-cell {
+    width: 32px;
+    height: 32px;
+    border-radius: 6px;
+    border: 1px solid var(--border);
+    background: #fff;
+    position: relative;
+  }
+  .cw-cell.blocked {
+    background: #1F2937;
+    border-color: #1F2937;
+  }
+  .cw-input {
+    width: 100%;
+    height: 100%;
+    border: none;
+    outline: none;
+    background: transparent;
+    text-transform: uppercase;
+    text-align: center;
+    font-size: 0.95rem;
+    font-weight: 800;
+    color: var(--primary);
+    border-radius: 6px;
+  }
+  .cw-input.cw-correct {
+    background: var(--success-light);
+    color: var(--success);
+  }
+  .cw-input.cw-wrong {
+    background: #FEF2F0;
+    color: var(--accent);
+  }
+  .cw-num {
+    position: absolute;
+    left: 2px;
+    top: 1px;
+    font-size: 0.5rem;
+    color: var(--text-muted);
+    font-weight: 700;
+    pointer-events: none;
+  }
+  .cw-clues {
+    margin-top: 0.35rem;
+    border-top: 1px dashed var(--border);
+    padding-top: 0.45rem;
+  }
+  .cw-clues h3 {
+    font-size: 0.76rem;
+    color: var(--primary);
+    margin-bottom: 0.25rem;
+  }
+  .cw-clues ol {
+    margin: 0 0 0 1rem;
+    color: var(--text-muted);
+    font-size: 0.74rem;
+    line-height: 1.45;
+  }
+  .cw-clues li { margin-bottom: 0.2rem; }
 
   /* === FOOTER === */
   .footer {
@@ -924,6 +996,34 @@
         <button class="btn btn-ghost" onclick="initSort()">🔄 New Run</button>
       </div>
       <div class="mini-complete" id="sortComplete"></div>
+    </div>
+  </div>
+
+  <div class="content-block" id="batch3Block">
+    <h2>Batch 3: Beginner AI Crossword</h2>
+    <p>Type one letter per box. Correct letters turn green; incorrect letters turn red immediately.</p>
+    <div class="cw-wrap">
+      <div class="mini-stats">
+        <span>Filled <strong id="cwFilled">0</strong>/<strong id="cwTotal">0</strong></span>
+        <span>Correct <strong id="cwCorrect">0</strong></span>
+      </div>
+      <div class="cw-grid" id="cwGrid"></div>
+      <div class="mini-feedback" id="cwFeedback">Use the clues to fill each AI term.</div>
+      <div style="text-align:center;">
+        <button class="btn btn-ghost" onclick="initCrossword()">🔄 Reset Crossword</button>
+      </div>
+      <div class="mini-complete" id="cwComplete"></div>
+      <div class="cw-clues">
+        <h3>Across Clues</h3>
+        <ol>
+          <li><strong>1.</strong> Computer systems that mimic human intelligence (2)</li>
+          <li><strong>2.</strong> Information used to train AI models (4)</li>
+          <li><strong>3.</strong> A system trained to make predictions (5)</li>
+          <li><strong>4.</strong> A machine that can perform tasks automatically (5)</li>
+          <li><strong>5.</strong> The instruction you type for an AI tool (6)</li>
+          <li><strong>6.</strong> Human judgment needed to use AI responsibly (6)</li>
+        </ol>
+      </div>
     </div>
   </div>
 
@@ -1455,7 +1555,7 @@ function checkScramble() {
 }
 
 function applyViewMode() {
-  if (viewMode !== 'batch2') return;
+  if (viewMode !== 'batch2' && viewMode !== 'batch3') return;
 
   const hideIds = ['mainHeader', 'warmupBlock', 'howToBlock', 'studentBar', 'gameNav', 'reflectBlock', 'masterComplete'];
   hideIds.forEach((id) => {
@@ -1468,12 +1568,17 @@ function applyViewMode() {
   });
 
   const batch2 = document.getElementById('batch2Block');
-  if (batch2) {
-    batch2.style.marginTop = '0';
+  const batch3 = document.getElementById('batch3Block');
+  if (viewMode === 'batch2') {
+    if (batch2) batch2.style.marginTop = '0';
+    if (batch3) batch3.style.display = 'none';
+    switchBatch2Game(0);
+    document.title = 'A&P Study Break — Batch 2 Arcade';
+  } else {
+    if (batch2) batch2.style.display = 'none';
+    if (batch3) batch3.style.marginTop = '0';
+    document.title = 'A&P Study Break — Batch 3 AI Crossword';
   }
-
-  switchBatch2Game(0);
-  document.title = 'A&P Study Break — Batch 2 Arcade';
 }
 
 // ==========================================
@@ -1656,6 +1761,107 @@ function submitSort(category) {
 }
 
 // ==========================================
+// BATCH 3: BEGINNER AI CROSSWORD
+// ==========================================
+const crosswordEntries = [
+  { num: 1, row: 0, col: 2, word: 'AI' },
+  { num: 2, row: 2, col: 1, word: 'DATA' },
+  { num: 3, row: 4, col: 1, word: 'MODEL' },
+  { num: 4, row: 6, col: 2, word: 'ROBOT' },
+  { num: 5, row: 8, col: 0, word: 'PROMPT' },
+  { num: 6, row: 8, col: 7, word: 'ETHICS' },
+];
+const cwRows = 9;
+const cwCols = 13;
+let crosswordKeyMap = {};
+
+function initCrossword() {
+  crosswordKeyMap = {};
+  const numberedMap = {};
+  crosswordEntries.forEach((entry) => {
+    for (let i = 0; i < entry.word.length; i++) {
+      const key = `${entry.row}-${entry.col + i}`;
+      crosswordKeyMap[key] = entry.word[i];
+      if (i === 0) numberedMap[key] = entry.num;
+    }
+  });
+
+  const grid = document.getElementById('cwGrid');
+  grid.style.gridTemplateColumns = `repeat(${cwCols}, 32px)`;
+  grid.innerHTML = '';
+  document.getElementById('cwTotal').textContent = Object.keys(crosswordKeyMap).length.toString();
+
+  for (let r = 0; r < cwRows; r++) {
+    for (let c = 0; c < cwCols; c++) {
+      const key = `${r}-${c}`;
+      const cell = document.createElement('div');
+      cell.className = 'cw-cell';
+      if (!crosswordKeyMap[key]) {
+        cell.classList.add('blocked');
+      } else {
+        const input = document.createElement('input');
+        input.className = 'cw-input';
+        input.maxLength = 1;
+        input.autocomplete = 'off';
+        input.dataset.key = key;
+        input.addEventListener('input', handleCrosswordInput);
+        cell.appendChild(input);
+
+        if (numberedMap[key]) {
+          const num = document.createElement('span');
+          num.className = 'cw-num';
+          num.textContent = numberedMap[key].toString();
+          cell.appendChild(num);
+        }
+      }
+      grid.appendChild(cell);
+    }
+  }
+
+  document.getElementById('cwFeedback').textContent = 'Use the clues to fill each AI term.';
+  document.getElementById('cwComplete').classList.remove('show');
+  updateCrosswordStats();
+}
+
+function handleCrosswordInput(e) {
+  const input = e.target;
+  const key = input.dataset.key;
+  const expected = crosswordKeyMap[key];
+  const value = (input.value || '').toUpperCase().replace(/[^A-Z]/g, '');
+  input.value = value;
+  input.classList.remove('cw-correct', 'cw-wrong');
+
+  if (!value) {
+    updateCrosswordStats();
+    return;
+  }
+
+  if (value === expected) {
+    input.classList.add('cw-correct');
+  } else {
+    input.classList.add('cw-wrong');
+  }
+  updateCrosswordStats();
+}
+
+function updateCrosswordStats() {
+  const inputs = Array.from(document.querySelectorAll('.cw-input'));
+  const filled = inputs.filter((i) => i.value).length;
+  const correct = inputs.filter((i) => i.classList.contains('cw-correct')).length;
+  document.getElementById('cwFilled').textContent = filled.toString();
+  document.getElementById('cwCorrect').textContent = correct.toString();
+
+  const done = document.getElementById('cwComplete');
+  if (correct === Object.keys(crosswordKeyMap).length) {
+    done.textContent = '✅ Crossword complete! Great beginner AI vocabulary recall.';
+    done.classList.add('show');
+    document.getElementById('cwFeedback').textContent = 'Excellent work. All letters are correct.';
+  } else {
+    done.classList.remove('show');
+  }
+}
+
+// ==========================================
 // INIT
 // ==========================================
 initMemory();
@@ -1663,6 +1869,7 @@ initConnect();
 initScramble();
 initBlaster();
 initSort();
+initCrossword();
 applyViewMode();
 </script>
 </body>

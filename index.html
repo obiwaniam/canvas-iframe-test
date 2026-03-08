@@ -1,0 +1,1166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>A&P Study Break — Micro-Game Sampler</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@700;800&display=swap');
+
+  :root {
+    --bg: #F7F5F0;
+    --card: #FFFFFF;
+    --primary: #1B4965;
+    --primary-light: #5FA8D3;
+    --accent: #EE6C4D;
+    --accent-glow: #FF8A6E;
+    --success: #2D936C;
+    --success-light: #DCEFD8;
+    --warning: #F4A261;
+    --text: #1A1A2E;
+    --text-muted: #6B7280;
+    --border: #E5E1DA;
+    --shadow: 0 4px 24px rgba(27,73,101,0.08);
+    --shadow-lg: 0 12px 40px rgba(27,73,101,0.12);
+  }
+
+  * { margin:0; padding:0; box-sizing:border-box; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* === SUBTLE TEXTURE BG === */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background:
+      radial-gradient(circle at 20% 80%, rgba(95,168,211,0.06) 0%, transparent 50%),
+      radial-gradient(circle at 80% 20%, rgba(238,108,77,0.04) 0%, transparent 50%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* === LAYOUT === */
+  .app { position: relative; z-index: 1; max-width: 720px; margin: 0 auto; padding: 1.5rem; }
+
+  /* === HEADER === */
+  .header {
+    text-align: center;
+    padding: 1.5rem 0 1rem;
+  }
+  .header-tag {
+    display: inline-block;
+    background: var(--primary);
+    color: #fff;
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    padding: 0.3rem 1rem;
+    border-radius: 50px;
+    margin-bottom: 0.75rem;
+  }
+  .header h1 {
+    font-family: 'Playfair Display', serif;
+    font-weight: 800;
+    font-size: 1.8rem;
+    color: var(--primary);
+    line-height: 1.2;
+  }
+  .header p {
+    color: var(--text-muted);
+    font-size: 0.95rem;
+    margin-top: 0.4rem;
+  }
+
+  /* === STUDENT BAR === */
+  .student-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 0.75rem 1.25rem;
+    margin-bottom: 1.25rem;
+    box-shadow: var(--shadow);
+  }
+  .student-name { font-weight: 600; font-size: 0.95rem; }
+  .badge-row { display: flex; gap: 0.4rem; }
+  .badge-slot {
+    width: 32px; height: 32px;
+    border-radius: 50%;
+    background: var(--border);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.85rem;
+    transition: all 0.4s cubic-bezier(0.34,1.56,0.64,1);
+    position: relative;
+  }
+  .badge-slot.earned {
+    background: var(--warning);
+    transform: scale(1);
+    animation: badgePop 0.5s cubic-bezier(0.34,1.56,0.64,1);
+  }
+  @keyframes badgePop {
+    0% { transform: scale(0); }
+    100% { transform: scale(1); }
+  }
+
+  /* === GAME SELECTOR === */
+  .game-nav {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.75rem;
+    margin-bottom: 1.25rem;
+  }
+  .game-nav-btn {
+    background: var(--card);
+    border: 2px solid var(--border);
+    border-radius: 14px;
+    padding: 1rem 0.5rem;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.25s;
+    box-shadow: var(--shadow);
+  }
+  .game-nav-btn:hover {
+    border-color: var(--primary-light);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lg);
+  }
+  .game-nav-btn.active {
+    border-color: var(--primary);
+    background: linear-gradient(135deg, var(--primary), #2A6F97);
+    color: #fff;
+  }
+  .game-nav-btn .nav-emoji { font-size: 1.5rem; display: block; margin-bottom: 0.3rem; }
+  .game-nav-btn .nav-label { font-weight: 600; font-size: 0.8rem; }
+  .game-nav-btn .nav-sub { font-size: 0.7rem; opacity: 0.7; margin-top: 0.15rem; }
+  .game-nav-btn.active .nav-sub { opacity: 0.85; }
+  .game-nav-btn .nav-check { font-size: 0.7rem; margin-top: 0.25rem; display: block; }
+
+  /* === GAME CONTAINERS === */
+  .game-panel {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 18px;
+    padding: 1.5rem;
+    box-shadow: var(--shadow-lg);
+    display: none;
+    animation: panelIn 0.4s ease;
+  }
+  .game-panel.active { display: block; }
+  @keyframes panelIn {
+    from { opacity:0; transform: translateY(12px); }
+    to { opacity:1; transform: translateY(0); }
+  }
+
+  .game-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.3rem;
+    color: var(--primary);
+    margin-bottom: 0.25rem;
+  }
+  .game-desc {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    margin-bottom: 1rem;
+  }
+
+  /* === GAME 1: MEMORY FLIP === */
+  .memory-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0.6rem;
+    margin-bottom: 1rem;
+  }
+  .mem-card {
+    aspect-ratio: 1;
+    perspective: 600px;
+    cursor: pointer;
+  }
+  .mem-card-inner {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    transition: transform 0.5s cubic-bezier(0.4,0,0.2,1);
+    transform-style: preserve-3d;
+    border-radius: 12px;
+  }
+  .mem-card.flipped .mem-card-inner { transform: rotateY(180deg); }
+  .mem-card.matched .mem-card-inner { transform: rotateY(180deg); }
+  .mem-card.matched { pointer-events: none; }
+
+  .mem-front, .mem-back {
+    position: absolute;
+    inset: 0;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    backface-visibility: hidden;
+    font-weight: 600;
+    padding: 0.4rem;
+    text-align: center;
+    font-size: 0.72rem;
+    line-height: 1.3;
+  }
+  .mem-front {
+    background: linear-gradient(135deg, var(--primary), #2A6F97);
+    color: rgba(255,255,255,0.3);
+    font-size: 1.8rem;
+  }
+  .mem-back {
+    background: var(--card);
+    border: 2px solid var(--primary-light);
+    color: var(--primary);
+    transform: rotateY(180deg);
+  }
+  .mem-back.is-def {
+    background: #F0F7FF;
+    border-color: var(--primary-light);
+    font-size: 0.68rem;
+    font-weight: 500;
+  }
+  .mem-card.matched .mem-back {
+    border-color: var(--success);
+    background: var(--success-light);
+  }
+
+  .mem-stats {
+    display: flex;
+    justify-content: center;
+    gap: 1.5rem;
+    font-size: 0.85rem;
+    color: var(--text-muted);
+  }
+  .mem-stats span { font-weight: 700; color: var(--primary); }
+
+  /* === GAME 2: CONNECTION DRAW === */
+  .connect-area { position: relative; margin-bottom: 1rem; }
+  .connect-columns {
+    display: flex;
+    justify-content: space-between;
+    position: relative;
+    z-index: 2;
+  }
+  .connect-col { display: flex; flex-direction: column; gap: 0.6rem; width: 42%; }
+
+  .connect-item {
+    background: var(--card);
+    border: 2px solid var(--border);
+    border-radius: 12px;
+    padding: 0.7rem 0.85rem;
+    font-size: 0.82rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    position: relative;
+    user-select: none;
+  }
+  .connect-item:hover { border-color: var(--primary-light); }
+  .connect-item.selected {
+    border-color: var(--accent);
+    background: #FFF5F2;
+    box-shadow: 0 0 0 3px rgba(238,108,77,0.15);
+  }
+  .connect-item.correct {
+    border-color: var(--success);
+    background: var(--success-light);
+    pointer-events: none;
+  }
+  .connect-item.wrong {
+    animation: shake 0.4s ease;
+    border-color: var(--accent);
+  }
+  @keyframes shake {
+    0%,100% { transform: translateX(0); }
+    25% { transform: translateX(-6px); }
+    75% { transform: translateX(6px); }
+  }
+
+  .connect-item .item-emoji { margin-right: 0.4rem; }
+
+  svg.connect-lines {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+    pointer-events: none;
+  }
+  svg.connect-lines line {
+    stroke: var(--success);
+    stroke-width: 2.5;
+    stroke-linecap: round;
+    opacity: 0;
+    transition: opacity 0.4s;
+  }
+  svg.connect-lines line.visible { opacity: 0.6; }
+
+  /* === GAME 3: WORD SCRAMBLE === */
+  .scramble-word {
+    display: flex;
+    justify-content: center;
+    gap: 0.4rem;
+    flex-wrap: wrap;
+    margin-bottom: 1rem;
+  }
+  .letter-tile {
+    width: 40px; height: 48px;
+    background: linear-gradient(135deg, var(--primary), #2A6F97);
+    color: #fff;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Playfair Display', serif;
+    font-size: 1.2rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s;
+    user-select: none;
+    box-shadow: 0 3px 8px rgba(27,73,101,0.2);
+  }
+  .letter-tile:hover { transform: translateY(-3px); box-shadow: 0 6px 16px rgba(27,73,101,0.25); }
+  .letter-tile.used { opacity: 0.3; pointer-events: none; transform: scale(0.9); }
+
+  .answer-slots {
+    display: flex;
+    justify-content: center;
+    gap: 0.35rem;
+    flex-wrap: wrap;
+    margin-bottom: 0.75rem;
+    min-height: 52px;
+  }
+  .answer-slot {
+    width: 40px; height: 48px;
+    border: 2px dashed var(--border);
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Playfair Display', serif;
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: var(--primary);
+    background: #FAFAF7;
+    transition: all 0.2s;
+    cursor: pointer;
+  }
+  .answer-slot.filled {
+    border-style: solid;
+    border-color: var(--primary-light);
+    background: #F0F7FF;
+  }
+  .answer-slot.correct-letter {
+    border-color: var(--success);
+    background: var(--success-light);
+    color: var(--success);
+  }
+  .answer-slot.wrong-letter {
+    border-color: var(--accent);
+    background: #FEF2F0;
+    color: var(--accent);
+    animation: wrongPulse 0.4s ease;
+  }
+  @keyframes wrongPulse {
+    0%,100% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+  }
+  .letter-tile.hint-glow {
+    animation: hintPulse 1s ease-in-out infinite;
+    box-shadow: 0 0 16px rgba(244,162,97,0.6), 0 3px 8px rgba(27,73,101,0.2);
+  }
+  @keyframes hintPulse {
+    0%,100% { box-shadow: 0 0 8px rgba(244,162,97,0.3), 0 3px 8px rgba(27,73,101,0.2); }
+    50% { box-shadow: 0 0 20px rgba(244,162,97,0.7), 0 3px 8px rgba(27,73,101,0.2); }
+  }
+  .hint-nudge {
+    text-align: center;
+    font-size: 0.8rem;
+    color: var(--warning);
+    font-weight: 600;
+    margin-top: 0.5rem;
+    animation: fadeIn 0.4s ease;
+  }
+  @keyframes fadeIn {
+    from { opacity:0; transform:translateY(-4px); }
+    to { opacity:1; transform:translateY(0); }
+  }
+
+  .scramble-hint {
+    text-align: center;
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    margin-bottom: 1rem;
+    font-style: italic;
+    min-height: 1.5em;
+  }
+
+  .scramble-controls {
+    display: flex;
+    justify-content: center;
+    gap: 0.75rem;
+  }
+
+  /* === SHARED BUTTON STYLES === */
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.6rem 1.25rem;
+    border-radius: 10px;
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 600;
+    font-size: 0.85rem;
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .btn:hover { transform: translateY(-1px); }
+  .btn-primary {
+    background: var(--primary);
+    color: #fff;
+  }
+  .btn-accent {
+    background: var(--accent);
+    color: #fff;
+  }
+  .btn-ghost {
+    background: transparent;
+    border: 2px solid var(--border);
+    color: var(--text-muted);
+  }
+  .btn-ghost:hover { border-color: var(--primary-light); color: var(--primary); }
+
+  /* === COMPLETION CODE === */
+  .completion-banner {
+    background: linear-gradient(135deg, var(--success), #38B2AC);
+    color: #fff;
+    border-radius: 14px;
+    padding: 1.25rem;
+    text-align: center;
+    margin-top: 1rem;
+    animation: bannerIn 0.5s cubic-bezier(0.34,1.56,0.64,1);
+    display: none;
+  }
+  .completion-banner.show { display: block; }
+  @keyframes bannerIn {
+    from { transform: scale(0.9); opacity:0; }
+    to { transform: scale(1); opacity:1; }
+  }
+  .completion-code {
+    display: inline-block;
+    background: rgba(255,255,255,0.2);
+    padding: 0.4rem 1.25rem;
+    border-radius: 8px;
+    font-family: 'Playfair Display', serif;
+    font-size: 1.3rem;
+    font-weight: 700;
+    letter-spacing: 2px;
+    margin-top: 0.5rem;
+  }
+
+  /* === CONFETTI === */
+  .confetti-container {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 1000;
+    overflow: hidden;
+  }
+  .confetti-piece {
+    position: absolute;
+    width: 10px;
+    height: 10px;
+    top: -20px;
+    animation: confettiFall linear forwards;
+  }
+  @keyframes confettiFall {
+    0% { transform: translateY(0) rotate(0deg); opacity: 1; }
+    100% { transform: translateY(105vh) rotate(720deg); opacity: 0; }
+  }
+
+  /* === TIMER BAR === */
+  .timer-bar-wrap {
+    height: 6px;
+    background: var(--border);
+    border-radius: 3px;
+    margin-bottom: 1rem;
+    overflow: hidden;
+  }
+  .timer-bar {
+    height: 100%;
+    background: linear-gradient(90deg, var(--success), var(--primary-light));
+    border-radius: 3px;
+    transition: width 0.1s linear;
+  }
+  .timer-bar.warning { background: linear-gradient(90deg, var(--warning), var(--accent)); }
+  .timer-bar.danger { background: var(--accent); }
+
+  .timer-text {
+    text-align: center;
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    margin-bottom: 0.75rem;
+  }
+
+  /* === FOOTER === */
+  .footer {
+    text-align: center;
+    padding: 1.5rem 0;
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    opacity: 0.6;
+  }
+</style>
+</head>
+<body>
+
+<div class="app">
+  <div class="header">
+    <div class="header-tag">A&P Study Break</div>
+    <h1>Skeletal & Muscular System</h1>
+    <p>Module 3 — Micro-Game Sampler</p>
+  </div>
+
+  <!-- STUDENT BAR -->
+  <div class="student-bar">
+    <div class="student-name" id="studentName">👋 Student</div>
+    <div class="badge-row">
+      <div class="badge-slot" id="badge1" title="Memory Master">🔒</div>
+      <div class="badge-slot" id="badge2" title="Connector">🔒</div>
+      <div class="badge-slot" id="badge3" title="Word Wizard">🔒</div>
+    </div>
+  </div>
+
+  <!-- GAME NAV -->
+  <div class="game-nav">
+    <div class="game-nav-btn active" onclick="switchGame(0)" id="nav0">
+      <span class="nav-emoji">🧠</span>
+      <span class="nav-label">Memory Flip</span>
+      <span class="nav-sub">Bone ID</span>
+      <span class="nav-check" id="nav0check"></span>
+    </div>
+    <div class="game-nav-btn" onclick="switchGame(1)" id="nav1">
+      <span class="nav-emoji">🔗</span>
+      <span class="nav-label">Connect</span>
+      <span class="nav-sub">Muscle → Function</span>
+      <span class="nav-check" id="nav1check"></span>
+    </div>
+    <div class="game-nav-btn" onclick="switchGame(2)" id="nav2">
+      <span class="nav-emoji">🔤</span>
+      <span class="nav-label">Scramble</span>
+      <span class="nav-sub">A&P Terms</span>
+      <span class="nav-check" id="nav2check"></span>
+    </div>
+  </div>
+
+  <!-- ============ GAME 1: MEMORY FLIP ============ -->
+  <div class="game-panel active" id="game0">
+    <div class="game-title">🧠 Memory Flip</div>
+    <div class="game-desc">Match each bone to its description. Flip two cards at a time — find all 6 pairs!</div>
+    <div class="timer-bar-wrap"><div class="timer-bar" id="memTimer" style="width:100%"></div></div>
+    <div class="timer-text" id="memTimerText">⏱ 1:30</div>
+    <div class="memory-grid" id="memoryGrid"></div>
+    <div class="mem-stats">
+      Matches: <span id="memMatches">0</span>/6 &nbsp;&nbsp; Flips: <span id="memFlips">0</span>
+    </div>
+    <div style="text-align:center; margin-top:0.75rem;">
+      <button class="btn btn-ghost" onclick="initMemory()">🔄 Reset</button>
+    </div>
+    <div class="completion-banner" id="memComplete">
+      <div>🏅 <strong>Memory Master!</strong></div>
+      <div style="font-size:0.85rem; margin-top:0.3rem;">You matched all bone pairs!</div>
+      <div class="completion-code" id="memCode"></div>
+    </div>
+  </div>
+
+  <!-- ============ GAME 2: CONNECTION DRAW ============ -->
+  <div class="game-panel" id="game1">
+    <div class="game-title">🔗 Connection Match</div>
+    <div class="game-desc">Select a muscle on the left, then its function on the right. Match all 5 pairs!</div>
+    <div class="connect-area" id="connectArea">
+      <svg class="connect-lines" id="connectSvg"></svg>
+      <div class="connect-columns">
+        <div class="connect-col" id="connectLeft"></div>
+        <div class="connect-col" id="connectRight"></div>
+      </div>
+    </div>
+    <div class="mem-stats">
+      Matched: <span id="conMatches">0</span>/5
+    </div>
+    <div style="text-align:center; margin-top:0.75rem;">
+      <button class="btn btn-ghost" onclick="initConnect()">🔄 Reset</button>
+    </div>
+    <div class="completion-banner" id="conComplete">
+      <div>🏅 <strong>Connector!</strong></div>
+      <div style="font-size:0.85rem; margin-top:0.3rem;">All muscles matched to their functions!</div>
+      <div class="completion-code" id="conCode"></div>
+    </div>
+  </div>
+
+  <!-- ============ GAME 3: WORD SCRAMBLE ============ -->
+  <div class="game-panel" id="game2">
+    <div class="game-title">🔤 Word Scramble</div>
+    <div class="game-desc">Unscramble the A&P term. Click letters to place them — correct letters lock in green, wrong letters flash red. Stuck? Wait for a hint or tap the hint button!</div>
+    <div class="timer-bar-wrap"><div class="timer-bar" id="scrTimer" style="width:100%"></div></div>
+    <div class="timer-text" id="scrTimerText">⏱ 0:45</div>
+    <div class="scramble-hint" id="scrHint"></div>
+    <div class="answer-slots" id="answerSlots"></div>
+    <div class="scramble-word" id="scrambleLetters"></div>
+    <div class="mem-stats" style="margin-bottom:0.75rem;">
+      Word: <span id="scrWord">1</span>/5
+    </div>
+    <div class="scramble-controls">
+      <button class="btn btn-ghost" onclick="clearScramble()">↩ Clear</button>
+      <button class="btn btn-primary" onclick="checkScramble()">💡 Hint</button>
+    </div>
+    <div class="completion-banner" id="scrComplete">
+      <div>🏅 <strong>Word Wizard!</strong></div>
+      <div style="font-size:0.85rem; margin-top:0.3rem;">All A&P terms unscrambled!</div>
+      <div class="completion-code" id="scrCode"></div>
+    </div>
+  </div>
+
+  <!-- MASTER COMPLETION -->
+  <div class="completion-banner" id="masterComplete">
+    <div style="font-size:1.5rem;">🎉🏆🎉</div>
+    <div style="font-size:1.1rem; margin-top:0.4rem;"><strong>All Games Complete!</strong></div>
+    <div style="font-size:0.85rem; margin-top:0.3rem;">Submit this code in your Canvas assignment:</div>
+    <div class="completion-code" id="masterCode"></div>
+  </div>
+
+  <div class="footer">A&P Study Break — Pure HTML/CSS/JS • Embeddable via iframe in Canvas LMS</div>
+</div>
+
+<div class="confetti-container" id="confettiBox"></div>
+
+<script>
+// ==========================================
+// URL PARAM HANDLING (student name, section)
+// ==========================================
+const params = new URLSearchParams(window.location.search);
+const studentName = params.get('student') || 'Student';
+const section = params.get('section') || 'AP101';
+document.getElementById('studentName').textContent = `👋 ${studentName}`;
+
+// ==========================================
+// GAME STATE
+// ==========================================
+let gamesComplete = [false, false, false];
+const completionCodes = ['FEMUR42', 'DELTOID7', 'TENDON99'];
+
+function switchGame(idx) {
+  document.querySelectorAll('.game-panel').forEach((p,i) => {
+    p.classList.toggle('active', i === idx);
+  });
+  document.querySelectorAll('.game-nav-btn').forEach((b,i) => {
+    b.classList.toggle('active', i === idx);
+  });
+}
+
+function earnBadge(idx) {
+  gamesComplete[idx] = true;
+  const badges = ['🦴','🔗','📖'];
+  const el = document.getElementById(`badge${idx+1}`);
+  el.textContent = badges[idx];
+  el.classList.add('earned');
+  document.getElementById(`nav${idx}check`).textContent = '✅';
+  
+  if (gamesComplete.every(Boolean)) {
+    setTimeout(() => {
+      document.getElementById('masterComplete').classList.add('show');
+      document.getElementById('masterCode').textContent = `${section}-APEX-${studentName.substring(0,3).toUpperCase()}`;
+      fireConfetti(80);
+    }, 800);
+  }
+}
+
+function fireConfetti(count=40) {
+  const box = document.getElementById('confettiBox');
+  const colors = ['#EE6C4D','#5FA8D3','#F4A261','#2D936C','#1B4965','#FFD166'];
+  for (let i = 0; i < count; i++) {
+    const piece = document.createElement('div');
+    piece.className = 'confetti-piece';
+    piece.style.left = Math.random() * 100 + '%';
+    piece.style.background = colors[Math.floor(Math.random() * colors.length)];
+    piece.style.borderRadius = Math.random() > 0.5 ? '50%' : '2px';
+    piece.style.width = (6 + Math.random() * 8) + 'px';
+    piece.style.height = (6 + Math.random() * 8) + 'px';
+    piece.style.animationDuration = (1.5 + Math.random() * 2) + 's';
+    piece.style.animationDelay = (Math.random() * 0.8) + 's';
+    box.appendChild(piece);
+  }
+  setTimeout(() => { box.innerHTML = ''; }, 4000);
+}
+
+// ==========================================
+// GAME 1: MEMORY FLIP
+// ==========================================
+const memPairs = [
+  { term: 'Femur', def: 'Longest bone in the body; forms the thigh' },
+  { term: 'Patella', def: 'Small flat bone that protects the knee joint' },
+  { term: 'Scapula', def: 'Shoulder blade; anchors muscles of the arm' },
+  { term: 'Sternum', def: 'Breastbone; protects heart and connects ribs' },
+  { term: 'Humerus', def: 'Upper arm bone; from shoulder to elbow' },
+  { term: 'Tibia', def: 'Shinbone; main weight-bearing bone of lower leg' },
+];
+
+let memCards = [], memFlipped = [], memMatchCount = 0, memFlipCount = 0;
+let memTimerInterval, memTimeLeft;
+
+function initMemory() {
+  memFlipped = []; memMatchCount = 0; memFlipCount = 0;
+  document.getElementById('memMatches').textContent = '0';
+  document.getElementById('memFlips').textContent = '0';
+  document.getElementById('memComplete').classList.remove('show');
+  
+  // Build card array: term + def for each pair
+  memCards = [];
+  memPairs.forEach((p,i) => {
+    memCards.push({ id: i, type: 'term', text: p.term, pairId: i });
+    memCards.push({ id: i, type: 'def', text: p.def, pairId: i });
+  });
+  
+  // Shuffle
+  for (let i = memCards.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [memCards[i], memCards[j]] = [memCards[j], memCards[i]];
+  }
+  
+  const grid = document.getElementById('memoryGrid');
+  grid.innerHTML = '';
+  memCards.forEach((card, idx) => {
+    const div = document.createElement('div');
+    div.className = 'mem-card';
+    div.dataset.idx = idx;
+    div.innerHTML = `
+      <div class="mem-card-inner">
+        <div class="mem-front">🦴</div>
+        <div class="mem-back ${card.type === 'def' ? 'is-def' : ''}">${card.text}</div>
+      </div>`;
+    div.addEventListener('click', () => flipCard(idx, div));
+    grid.appendChild(div);
+  });
+  
+  // Timer: 90 seconds
+  clearInterval(memTimerInterval);
+  memTimeLeft = 90;
+  updateMemTimer();
+  memTimerInterval = setInterval(() => {
+    memTimeLeft--;
+    updateMemTimer();
+    if (memTimeLeft <= 0) { clearInterval(memTimerInterval); }
+  }, 1000);
+}
+
+function updateMemTimer() {
+  const pct = (memTimeLeft / 90) * 100;
+  const bar = document.getElementById('memTimer');
+  bar.style.width = pct + '%';
+  bar.className = 'timer-bar' + (pct < 20 ? ' danger' : pct < 40 ? ' warning' : '');
+  const m = Math.floor(memTimeLeft / 60);
+  const s = memTimeLeft % 60;
+  document.getElementById('memTimerText').textContent = `⏱ ${m}:${s.toString().padStart(2,'0')}`;
+}
+
+function flipCard(idx, el) {
+  if (memFlipped.length >= 2) return;
+  if (el.classList.contains('flipped') || el.classList.contains('matched')) return;
+  
+  el.classList.add('flipped');
+  memFlipped.push({ idx, el });
+  memFlipCount++;
+  document.getElementById('memFlips').textContent = memFlipCount;
+  
+  if (memFlipped.length === 2) {
+    const [a, b] = memFlipped;
+    if (memCards[a.idx].pairId === memCards[b.idx].pairId && a.idx !== b.idx) {
+      // Match!
+      setTimeout(() => {
+        a.el.classList.add('matched');
+        b.el.classList.add('matched');
+        memMatchCount++;
+        document.getElementById('memMatches').textContent = memMatchCount;
+        memFlipped = [];
+        
+        if (memMatchCount === 6) {
+          clearInterval(memTimerInterval);
+          document.getElementById('memComplete').classList.add('show');
+          document.getElementById('memCode').textContent = completionCodes[0];
+          fireConfetti();
+          earnBadge(0);
+        }
+      }, 300);
+    } else {
+      // No match
+      setTimeout(() => {
+        a.el.classList.remove('flipped');
+        b.el.classList.remove('flipped');
+        memFlipped = [];
+      }, 900);
+    }
+  }
+}
+
+// ==========================================
+// GAME 2: CONNECTION MATCH
+// ==========================================
+const conPairs = [
+  { muscle: 'Biceps Brachii', emoji: '💪', func: 'Flexes the forearm at the elbow' },
+  { muscle: 'Quadriceps', emoji: '🦵', func: 'Extends the leg at the knee' },
+  { muscle: 'Deltoid', emoji: '🏋️', func: 'Abducts the arm at the shoulder' },
+  { muscle: 'Gastrocnemius', emoji: '🦶', func: 'Plantar flexes the foot (calf raise)' },
+  { muscle: 'Diaphragm', emoji: '🫁', func: 'Primary muscle of breathing/respiration' },
+];
+
+let conSelected = null, conMatchCount = 0, conLines = [];
+
+function initConnect() {
+  conSelected = null; conMatchCount = 0; conLines = [];
+  document.getElementById('conMatches').textContent = '0';
+  document.getElementById('conComplete').classList.remove('show');
+  
+  const leftCol = document.getElementById('connectLeft');
+  const rightCol = document.getElementById('connectRight');
+  leftCol.innerHTML = '';
+  rightCol.innerHTML = '';
+  
+  // Shuffle right side
+  const shuffledRight = [...conPairs].sort(() => Math.random() - 0.5);
+  
+  conPairs.forEach((p, i) => {
+    const left = document.createElement('div');
+    left.className = 'connect-item';
+    left.dataset.side = 'left';
+    left.dataset.pair = i;
+    left.innerHTML = `<span class="item-emoji">${p.emoji}</span>${p.muscle}`;
+    left.addEventListener('click', () => selectConnect('left', i, left));
+    leftCol.appendChild(left);
+  });
+  
+  shuffledRight.forEach((p) => {
+    const origIdx = conPairs.indexOf(p);
+    const right = document.createElement('div');
+    right.className = 'connect-item';
+    right.dataset.side = 'right';
+    right.dataset.pair = origIdx;
+    right.textContent = p.func;
+    right.style.fontSize = '0.78rem';
+    right.addEventListener('click', () => selectConnect('right', origIdx, right));
+    rightCol.appendChild(right);
+  });
+  
+  // Reset SVG
+  document.getElementById('connectSvg').innerHTML = '';
+}
+
+function selectConnect(side, pairIdx, el) {
+  if (el.classList.contains('correct')) return;
+  
+  if (!conSelected) {
+    conSelected = { side, pairIdx, el };
+    el.classList.add('selected');
+  } else {
+    if (conSelected.side === side) {
+      // Same side - switch selection
+      conSelected.el.classList.remove('selected');
+      conSelected = { side, pairIdx, el };
+      el.classList.add('selected');
+    } else {
+      // Different sides - check match
+      if (conSelected.pairIdx === pairIdx) {
+        // Correct!
+        conSelected.el.classList.remove('selected');
+        conSelected.el.classList.add('correct');
+        el.classList.add('correct');
+        drawLine(conSelected.el, el);
+        conMatchCount++;
+        document.getElementById('conMatches').textContent = conMatchCount;
+        conSelected = null;
+        
+        if (conMatchCount === 5) {
+          document.getElementById('conComplete').classList.add('show');
+          document.getElementById('conCode').textContent = completionCodes[1];
+          fireConfetti();
+          earnBadge(1);
+        }
+      } else {
+        // Wrong
+        el.classList.add('wrong');
+        conSelected.el.classList.add('wrong');
+        const selEl = conSelected.el;
+        setTimeout(() => {
+          el.classList.remove('wrong');
+          selEl.classList.remove('wrong','selected');
+        }, 600);
+        conSelected = null;
+      }
+    }
+  }
+}
+
+function drawLine(elA, elB) {
+  const svg = document.getElementById('connectSvg');
+  const area = document.getElementById('connectArea');
+  const areaRect = area.getBoundingClientRect();
+  const rectA = elA.getBoundingClientRect();
+  const rectB = elB.getBoundingClientRect();
+  
+  const line = document.createElementNS('http://www.w3.org/2000/svg','line');
+  line.setAttribute('x1', rectA.right - areaRect.left);
+  line.setAttribute('y1', rectA.top + rectA.height/2 - areaRect.top);
+  line.setAttribute('x2', rectB.left - areaRect.left);
+  line.setAttribute('y2', rectB.top + rectB.height/2 - areaRect.top);
+  svg.appendChild(line);
+  requestAnimationFrame(() => line.classList.add('visible'));
+}
+
+// ==========================================
+// GAME 3: WORD SCRAMBLE
+// ==========================================
+const scrWords = [
+  { word: 'TENDON', hint: 'Connects muscle to bone' },
+  { word: 'CARTILAGE', hint: 'Flexible connective tissue found at joints' },
+  { word: 'LIGAMENT', hint: 'Connects bone to bone at joints' },
+  { word: 'MARROW', hint: 'Soft tissue inside bones that produces blood cells' },
+  { word: 'PERIOSTEUM', hint: 'Tough membrane covering the outer surface of bone' },
+];
+
+let scrIdx = 0, scrAnswer = [], scrTimerInterval, scrTimeLeft;
+let scrInactivityTimer = null, scrHintShown = false, scrLetterTiles = [];
+
+function resetInactivityTimer() {
+  clearTimeout(scrInactivityTimer);
+  scrHintShown = false;
+  clearHintGlow();
+  removeHintNudge();
+  scrInactivityTimer = setTimeout(() => showLetterHint(), 20000);
+}
+
+function showLetterHint() {
+  const current = scrWords[scrIdx];
+  if (!current) return;
+  const nextPos = scrAnswer.length;
+  if (nextPos >= current.word.length) return;
+  
+  const nextLetter = current.word[nextPos];
+  scrHintShown = true;
+  
+  // Find the correct tile in the scrambled letters and make it glow
+  scrLetterTiles.forEach(tile => {
+    if (!tile.el.classList.contains('used') && tile.letter === nextLetter && !tile.el.classList.contains('hint-glow')) {
+      tile.el.classList.add('hint-glow');
+    }
+  });
+  
+  // Add a nudge message
+  const existing = document.querySelector('.hint-nudge');
+  if (!existing) {
+    const nudge = document.createElement('div');
+    nudge.className = 'hint-nudge';
+    nudge.textContent = '👆 Try the glowing letter!';
+    document.getElementById('scrambleLetters').after(nudge);
+  }
+}
+
+function clearHintGlow() {
+  document.querySelectorAll('.letter-tile.hint-glow').forEach(t => t.classList.remove('hint-glow'));
+}
+
+function removeHintNudge() {
+  document.querySelectorAll('.hint-nudge').forEach(n => n.remove());
+}
+
+function initScramble() {
+  scrIdx = 0;
+  document.getElementById('scrComplete').classList.remove('show');
+  loadScrambleWord();
+}
+
+function loadScrambleWord() {
+  clearTimeout(scrInactivityTimer);
+  clearHintGlow();
+  removeHintNudge();
+  
+  if (scrIdx >= scrWords.length) {
+    document.getElementById('scrComplete').classList.add('show');
+    document.getElementById('scrCode').textContent = completionCodes[2];
+    fireConfetti();
+    earnBadge(2);
+    clearInterval(scrTimerInterval);
+    return;
+  }
+  
+  const current = scrWords[scrIdx];
+  scrAnswer = [];
+  scrLetterTiles = [];
+  scrHintShown = false;
+  document.getElementById('scrWord').textContent = (scrIdx + 1);
+  document.getElementById('scrHint').textContent = `💡 "${current.hint}"`;
+  
+  // Build answer slots
+  const slotsDiv = document.getElementById('answerSlots');
+  slotsDiv.innerHTML = '';
+  for (let i = 0; i < current.word.length; i++) {
+    const slot = document.createElement('div');
+    slot.className = 'answer-slot';
+    slot.dataset.pos = i;
+    slot.addEventListener('click', () => removeFromAnswer(i));
+    slotsDiv.appendChild(slot);
+  }
+  
+  // Scramble letters
+  const letters = current.word.split('');
+  for (let i = letters.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [letters[i], letters[j]] = [letters[j], letters[i]];
+  }
+  if (letters.join('') === current.word && letters.length > 1) {
+    [letters[0], letters[1]] = [letters[1], letters[0]];
+  }
+  
+  const lettersDiv = document.getElementById('scrambleLetters');
+  lettersDiv.innerHTML = '';
+  letters.forEach((l, i) => {
+    const tile = document.createElement('div');
+    tile.className = 'letter-tile';
+    tile.textContent = l;
+    tile.dataset.idx = i;
+    tile.addEventListener('click', () => addToAnswer(i, l, tile));
+    lettersDiv.appendChild(tile);
+    scrLetterTiles.push({ el: tile, letter: l, idx: i });
+  });
+  
+  // Timer: 60 seconds per word (extra time since we want them to think)
+  clearInterval(scrTimerInterval);
+  scrTimeLeft = 60;
+  updateScrTimer();
+  scrTimerInterval = setInterval(() => {
+    scrTimeLeft--;
+    updateScrTimer();
+    if (scrTimeLeft <= 0) {
+      clearInterval(scrTimerInterval);
+      // Timer ran out — just show a hint, student still has to finish
+      showLetterHint();
+    }
+  }, 1000);
+  
+  // Start inactivity timer
+  resetInactivityTimer();
+}
+
+function revealAnswer() {
+  const current = scrWords[scrIdx];
+  clearScramble();
+  const slots = document.querySelectorAll('.answer-slot');
+  current.word.split('').forEach((l, i) => {
+    if (slots[i]) {
+      slots[i].textContent = l;
+      slots[i].classList.add('filled', 'correct-letter');
+    }
+  });
+  setTimeout(() => {
+    scrIdx++;
+    loadScrambleWord();
+  }, 1500);
+}
+
+function updateScrTimer() {
+  const pct = (scrTimeLeft / 60) * 100;
+  const bar = document.getElementById('scrTimer');
+  bar.style.width = pct + '%';
+  bar.className = 'timer-bar' + (pct < 20 ? ' danger' : pct < 40 ? ' warning' : '');
+  const m = Math.floor(scrTimeLeft / 60);
+  const s = scrTimeLeft % 60;
+  document.getElementById('scrTimerText').textContent = `⏱ ${m}:${s.toString().padStart(2,'0')}`;
+}
+
+function addToAnswer(tileIdx, letter, tileEl) {
+  if (tileEl.classList.contains('used')) return;
+  const current = scrWords[scrIdx];
+  if (scrAnswer.length >= current.word.length) return;
+  
+  const pos = scrAnswer.length;
+  const expectedLetter = current.word[pos];
+  
+  // Reset inactivity timer on any interaction
+  resetInactivityTimer();
+  
+  if (letter === expectedLetter) {
+    // Correct letter!
+    tileEl.classList.add('used');
+    tileEl.classList.remove('hint-glow');
+    scrAnswer.push({ letter, tileIdx, tileEl });
+    
+    const slot = document.querySelectorAll('.answer-slot')[pos];
+    slot.textContent = letter;
+    slot.classList.add('filled', 'correct-letter');
+    slot.dataset.answerIdx = pos;
+    
+    // Check if word is complete
+    if (scrAnswer.length === current.word.length) {
+      clearInterval(scrTimerInterval);
+      clearTimeout(scrInactivityTimer);
+      clearHintGlow();
+      removeHintNudge();
+      setTimeout(() => {
+        scrIdx++;
+        loadScrambleWord();
+      }, 800);
+    }
+  } else {
+    // Wrong letter — flash red, bounce back
+    tileEl.classList.add('used');
+    const slot = document.querySelectorAll('.answer-slot')[pos];
+    slot.textContent = letter;
+    slot.classList.add('filled', 'wrong-letter');
+    
+    setTimeout(() => {
+      slot.textContent = '';
+      slot.classList.remove('filled', 'wrong-letter');
+      tileEl.classList.remove('used');
+    }, 500);
+  }
+}
+
+function removeFromAnswer(slotPos) {
+  // In the new system, correct letters lock in place — no removal
+  // This makes the game feel more progressive
+}
+
+function clearScramble() {
+  scrAnswer.forEach(a => a.tileEl.classList.remove('used'));
+  scrAnswer = [];
+  clearHintGlow();
+  removeHintNudge();
+  document.querySelectorAll('.answer-slot').forEach(s => {
+    s.textContent = '';
+    s.classList.remove('filled', 'correct-letter', 'wrong-letter');
+  });
+  resetInactivityTimer();
+}
+
+function checkScramble() {
+  // In the new system, letters auto-validate on placement
+  // This button now serves as a "give me a hint" button instead
+  showLetterHint();
+}
+
+// ==========================================
+// INIT
+// ==========================================
+initMemory();
+initConnect();
+initScramble();
+</script>
+</body>
+</html>

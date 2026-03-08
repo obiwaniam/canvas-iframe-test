@@ -728,13 +728,13 @@
 <body>
 
 <div class="app">
-  <div class="header">
+  <div class="header" id="mainHeader">
     <div class="header-tag">A&P Study Break</div>
     <h1>Skeletal & Muscular System</h1>
     <p>Module 3 — Micro-Game Sampler</p>
   </div>
 
-  <div class="content-block">
+  <div class="content-block" id="warmupBlock">
     <h2>Quick Warm-Up</h2>
     <p>This study break reinforces core vocabulary and function relationships from the skeletal and muscular systems. Use it as a focused review before quizzes, labs, or discussion posts.</p>
     <ul class="content-list">
@@ -744,14 +744,14 @@
     </ul>
   </div>
 
-  <div class="content-block">
+  <div class="content-block" id="howToBlock">
     <h2>How To Use This Activity</h2>
     <p>Complete each mini-game in order or jump between tabs. You will earn a badge for each game and unlock a personalized completion code after all three are done.</p>
     <p>Tip: Say each answer out loud as you play. Verbal recall can improve retention before your next assignment or exam.</p>
   </div>
 
   <!-- STUDENT BAR -->
-  <div class="student-bar">
+  <div class="student-bar" id="studentBar">
     <div class="student-name" id="studentName">👋 Student</div>
     <div class="badge-row">
       <div class="badge-slot" id="badge1" title="Memory Master">🔒</div>
@@ -761,7 +761,7 @@
   </div>
 
   <!-- GAME NAV -->
-  <div class="game-nav">
+  <div class="game-nav" id="gameNav">
     <div class="game-nav-btn active" onclick="switchGame(0)" id="nav0">
       <span class="nav-emoji">🧠</span>
       <span class="nav-label">Memory Flip</span>
@@ -857,13 +857,13 @@
     <div class="completion-code" id="masterCode"></div>
   </div>
 
-  <div class="content-block" style="margin-top:0.9rem;">
+  <div class="content-block" id="reflectBlock" style="margin-top:0.9rem;">
     <h2>Reflect And Connect</h2>
     <p>After finishing, write 2-3 sentences describing one bone and one muscle pair you still confuse, and one strategy you used to remember the difference.</p>
     <p>This reflection can become your quick study note for exam week.</p>
   </div>
 
-  <div class="content-block">
+  <div class="content-block" id="batch2Block">
     <h2>Batch 2 Arcade Practice</h2>
     <p>New game set added below. Play either mode for a quick pre-quiz warm-up, then switch to the other without leaving the page.</p>
     <div class="batch2-nav">
@@ -920,6 +920,7 @@
 const params = new URLSearchParams(window.location.search);
 const studentName = params.get('student') || 'Student';
 const section = params.get('section') || 'AP101';
+const viewMode = (params.get('view') || '').toLowerCase();
 document.getElementById('studentName').textContent = `👋 ${studentName}`;
 
 // ==========================================
@@ -1434,6 +1435,28 @@ function checkScramble() {
   showLetterHint();
 }
 
+function applyViewMode() {
+  if (viewMode !== 'batch2') return;
+
+  const hideIds = ['mainHeader', 'warmupBlock', 'howToBlock', 'studentBar', 'gameNav', 'reflectBlock', 'masterComplete'];
+  hideIds.forEach((id) => {
+    const el = document.getElementById(id);
+    if (el) el.style.display = 'none';
+  });
+
+  document.querySelectorAll('.game-panel').forEach((panel) => {
+    panel.style.display = 'none';
+  });
+
+  const batch2 = document.getElementById('batch2Block');
+  if (batch2) {
+    batch2.style.marginTop = '0';
+  }
+
+  switchBatch2Game(0);
+  document.title = 'A&P Study Break — Batch 2 Arcade';
+}
+
 // ==========================================
 // BATCH 2: ARCADE PRACTICE
 // ==========================================
@@ -1581,6 +1604,7 @@ initConnect();
 initScramble();
 initBlaster();
 initSort();
+applyViewMode();
 </script>
 </body>
 </html>

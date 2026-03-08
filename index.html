@@ -47,12 +47,12 @@
   }
 
   /* === LAYOUT === */
-  .app { position: relative; z-index: 1; max-width: 720px; margin: 0 auto; padding: 1.5rem; }
+  .app { position: relative; z-index: 1; max-width: 640px; margin: 0 auto; padding: 1.1rem; }
 
   /* === HEADER === */
   .header {
     text-align: center;
-    padding: 1.5rem 0 1rem;
+    padding: 1.1rem 0 0.8rem;
   }
   .header-tag {
     display: inline-block;
@@ -69,13 +69,13 @@
   .header h1 {
     font-family: 'Playfair Display', serif;
     font-weight: 800;
-    font-size: 1.8rem;
+    font-size: 1.55rem;
     color: var(--primary);
     line-height: 1.2;
   }
   .header p {
     color: var(--text-muted);
-    font-size: 0.95rem;
+    font-size: 0.9rem;
     margin-top: 0.4rem;
   }
 
@@ -86,12 +86,12 @@
     justify-content: space-between;
     background: var(--card);
     border: 1px solid var(--border);
-    border-radius: 14px;
-    padding: 0.75rem 1.25rem;
-    margin-bottom: 1.25rem;
+    border-radius: 12px;
+    padding: 0.65rem 0.95rem;
+    margin-bottom: 1rem;
     box-shadow: var(--shadow);
   }
-  .student-name { font-weight: 600; font-size: 0.95rem; }
+  .student-name { font-weight: 600; font-size: 0.88rem; }
   .badge-row { display: flex; gap: 0.4rem; }
   .badge-slot {
     width: 32px; height: 32px;
@@ -116,14 +116,14 @@
   .game-nav {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    gap: 0.75rem;
-    margin-bottom: 1.25rem;
+    gap: 0.55rem;
+    margin-bottom: 1rem;
   }
   .game-nav-btn {
     background: var(--card);
     border: 2px solid var(--border);
-    border-radius: 14px;
-    padding: 1rem 0.5rem;
+    border-radius: 12px;
+    padding: 0.8rem 0.45rem;
     text-align: center;
     cursor: pointer;
     transition: all 0.25s;
@@ -139,8 +139,8 @@
     background: linear-gradient(135deg, var(--primary), #2A6F97);
     color: #fff;
   }
-  .game-nav-btn .nav-emoji { font-size: 1.5rem; display: block; margin-bottom: 0.3rem; }
-  .game-nav-btn .nav-label { font-weight: 600; font-size: 0.8rem; }
+  .game-nav-btn .nav-emoji { font-size: 1.3rem; display: block; margin-bottom: 0.2rem; }
+  .game-nav-btn .nav-label { font-weight: 600; font-size: 0.76rem; }
   .game-nav-btn .nav-sub { font-size: 0.7rem; opacity: 0.7; margin-top: 0.15rem; }
   .game-nav-btn.active .nav-sub { opacity: 0.85; }
   .game-nav-btn .nav-check { font-size: 0.7rem; margin-top: 0.25rem; display: block; }
@@ -149,8 +149,8 @@
   .game-panel {
     background: var(--card);
     border: 1px solid var(--border);
-    border-radius: 18px;
-    padding: 1.5rem;
+    border-radius: 16px;
+    padding: 1.1rem;
     box-shadow: var(--shadow-lg);
     display: none;
     animation: panelIn 0.4s ease;
@@ -163,12 +163,12 @@
 
   .game-title {
     font-family: 'Playfair Display', serif;
-    font-size: 1.3rem;
+    font-size: 1.15rem;
     color: var(--primary);
     margin-bottom: 0.25rem;
   }
   .game-desc {
-    font-size: 0.85rem;
+    font-size: 0.8rem;
     color: var(--text-muted);
     margin-bottom: 1rem;
   }
@@ -177,7 +177,7 @@
   .memory-grid {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
-    gap: 0.6rem;
+    gap: 0.45rem;
     margin-bottom: 1rem;
   }
   .mem-card {
@@ -191,7 +191,7 @@
     height: 100%;
     transition: transform 0.5s cubic-bezier(0.4,0,0.2,1);
     transform-style: preserve-3d;
-    border-radius: 12px;
+    border-radius: 10px;
   }
   .mem-card.flipped .mem-card-inner { transform: rotateY(180deg); }
   .mem-card.matched .mem-card-inner { transform: rotateY(180deg); }
@@ -200,7 +200,7 @@
   .mem-front, .mem-back {
     position: absolute;
     inset: 0;
-    border-radius: 12px;
+    border-radius: 10px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -208,13 +208,13 @@
     font-weight: 600;
     padding: 0.4rem;
     text-align: center;
-    font-size: 0.72rem;
+    font-size: 0.66rem;
     line-height: 1.3;
   }
   .mem-front {
     background: linear-gradient(135deg, var(--primary), #2A6F97);
     color: rgba(255,255,255,0.3);
-    font-size: 1.8rem;
+    font-size: 1.45rem;
   }
   .mem-back {
     background: var(--card);
@@ -225,7 +225,7 @@
   .mem-back.is-def {
     background: #F0F7FF;
     border-color: var(--primary-light);
-    font-size: 0.68rem;
+    font-size: 0.61rem;
     font-weight: 500;
   }
   .mem-card.matched .mem-back {
@@ -236,8 +236,8 @@
   .mem-stats {
     display: flex;
     justify-content: center;
-    gap: 1.5rem;
-    font-size: 0.85rem;
+    gap: 1.1rem;
+    font-size: 0.8rem;
     color: var(--text-muted);
   }
   .mem-stats span { font-weight: 700; color: var(--primary); }
@@ -250,14 +250,14 @@
     position: relative;
     z-index: 2;
   }
-  .connect-col { display: flex; flex-direction: column; gap: 0.6rem; width: 42%; }
+  .connect-col { display: flex; flex-direction: column; gap: 0.5rem; width: 43%; }
 
   .connect-item {
     background: var(--card);
     border: 2px solid var(--border);
-    border-radius: 12px;
-    padding: 0.7rem 0.85rem;
-    font-size: 0.82rem;
+    border-radius: 10px;
+    padding: 0.55rem 0.7rem;
+    font-size: 0.76rem;
     font-weight: 600;
     cursor: pointer;
     transition: all 0.2s;
@@ -285,7 +285,7 @@
     75% { transform: translateX(6px); }
   }
 
-  .connect-item .item-emoji { margin-right: 0.4rem; }
+  .connect-item .item-emoji { margin-right: 0.3rem; }
 
   svg.connect-lines {
     position: absolute;
@@ -308,20 +308,20 @@
   .scramble-word {
     display: flex;
     justify-content: center;
-    gap: 0.4rem;
+    gap: 0.3rem;
     flex-wrap: wrap;
     margin-bottom: 1rem;
   }
   .letter-tile {
-    width: 40px; height: 48px;
+    width: 34px; height: 40px;
     background: linear-gradient(135deg, var(--primary), #2A6F97);
     color: #fff;
-    border-radius: 10px;
+    border-radius: 8px;
     display: flex;
     align-items: center;
     justify-content: center;
     font-family: 'Playfair Display', serif;
-    font-size: 1.2rem;
+    font-size: 1.05rem;
     font-weight: 700;
     cursor: pointer;
     transition: all 0.2s;
@@ -337,17 +337,17 @@
     gap: 0.35rem;
     flex-wrap: wrap;
     margin-bottom: 0.75rem;
-    min-height: 52px;
+    min-height: 44px;
   }
   .answer-slot {
-    width: 40px; height: 48px;
+    width: 34px; height: 40px;
     border: 2px dashed var(--border);
-    border-radius: 10px;
+    border-radius: 8px;
     display: flex;
     align-items: center;
     justify-content: center;
     font-family: 'Playfair Display', serif;
-    font-size: 1.2rem;
+    font-size: 1.05rem;
     font-weight: 700;
     color: var(--primary);
     background: #FAFAF7;
@@ -407,7 +407,7 @@
   .scramble-controls {
     display: flex;
     justify-content: center;
-    gap: 0.75rem;
+    gap: 0.6rem;
   }
 
   /* === SHARED BUTTON STYLES === */
@@ -415,11 +415,11 @@
     display: inline-flex;
     align-items: center;
     gap: 0.4rem;
-    padding: 0.6rem 1.25rem;
+    padding: 0.5rem 1rem;
     border-radius: 10px;
     font-family: 'DM Sans', sans-serif;
     font-weight: 600;
-    font-size: 0.85rem;
+    font-size: 0.8rem;
     border: none;
     cursor: pointer;
     transition: all 0.2s;
@@ -806,7 +806,7 @@ function flipCard(idx, el) {
         a.el.classList.remove('flipped');
         b.el.classList.remove('flipped');
         memFlipped = [];
-      }, 900);
+      }, 1300);
     }
   }
 }

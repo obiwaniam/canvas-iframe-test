@@ -662,25 +662,45 @@
     color: var(--text-muted);
     margin-bottom: 0.5rem;
   }
-  .incoming-card {
+  .sort-drop-zone {
+    position: relative;
+    height: 205px;
     border: 1px solid var(--primary-light);
     border-radius: 8px;
-    background: #F8FBFF;
-    padding: 0.65rem;
-    text-align: center;
+    background: linear-gradient(180deg, #F8FBFF 0%, #EEF6FF 100%);
+    overflow: hidden;
     margin-bottom: 0.55rem;
   }
-  .incoming-label {
+  .sort-drop-label {
+    position: absolute;
+    top: 7px;
+    left: 8px;
     font-size: 0.66rem;
     color: var(--text-muted);
-    margin-bottom: 0.15rem;
+    z-index: 2;
     text-transform: uppercase;
     letter-spacing: 1px;
   }
-  .incoming-term {
-    font-size: 0.95rem;
+  .sort-faller {
+    position: absolute;
+    left: 50%;
+    top: -42px;
+    transform: translateX(-50%);
+    background: #fff;
+    border: 1px solid var(--primary-light);
+    border-radius: 8px;
+    padding: 0.45rem 0.55rem;
+    min-width: 120px;
+    text-align: center;
+    font-size: 0.86rem;
     font-weight: 800;
     color: var(--primary);
+    animation: sortFall linear forwards;
+    box-shadow: 0 3px 8px rgba(27,73,101,0.15);
+  }
+  @keyframes sortFall {
+    from { top: -42px; }
+    to { top: 214px; }
   }
   .sort-bins {
     display: grid;
@@ -891,9 +911,8 @@
         <span>Correct <strong id="sortScore">0</strong></span>
       </div>
       <div class="sort-prompt">Classify the incoming term into the correct category:</div>
-      <div class="incoming-card">
-        <div class="incoming-label">Incoming Term</div>
-        <div class="incoming-term" id="sortTerm">Loading...</div>
+      <div class="sort-drop-zone" id="sortDropZone">
+        <div class="sort-drop-label">Incoming Term</div>
       </div>
       <div class="sort-bins">
         <button class="sort-bin-btn" onclick="submitSort('Bone')">🦴 Bone</button>
@@ -1469,6 +1488,7 @@ const blasterBank = [
   { clue: 'Muscle that flexes the forearm', answer: 'Biceps Brachii' },
 ];
 let blasterOrder = [], blasterIdx = 0, blasterScore = 0;
+let blasterRoundActive = false, blasterRemaining = 0;
 
 function switchBatch2Game(idx) {
   document.querySelectorAll('.batch2-panel').forEach((p, i) => {
@@ -1510,8 +1530,10 @@ function loadBlasterRound() {
   document.getElementById('blasterRound').textContent = (blasterIdx + 1).toString();
   const area = document.getElementById('blasterArea');
   area.innerHTML = '';
+  blasterRoundActive = true;
 
   const options = shuffleArray([current.answer, ...randomDecoys(current.answer, 5)]);
+  blasterRemaining = options.length;
   options.forEach((term, idx) => {
     const btn = document.createElement('button');
     btn.className = 'blaster-target';
@@ -1521,16 +1543,32 @@ function loadBlasterRound() {
     btn.style.animationDuration = (12.4 + Math.random() * 5.6).toFixed(2) + 's';
     btn.style.animationDelay = (Math.random() * 0.35).toFixed(2) + 's';
     btn.addEventListener('click', () => hitTarget(btn, term));
+    btn.addEventListener('animationend', () => onTargetExit(btn));
     area.appendChild(btn);
   });
 }
 
+function onTargetExit(btn) {
+  if (!btn.isConnected) return;
+  btn.remove();
+  if (!blasterRoundActive) return;
+  blasterRemaining--;
+  if (blasterRemaining <= 0) {
+    blasterRoundActive = false;
+    document.getElementById('blasterFeedback').textContent = '⏱ Missed round. Targets escaped.';
+    blasterIdx++;
+    setTimeout(loadBlasterRound, 420);
+  }
+}
+
 function hitTarget(btn, term) {
+  if (!blasterRoundActive) return;
   const current = blasterOrder[blasterIdx];
-  const allTargets = document.querySelectorAll('.blaster-target');
-  allTargets.forEach(t => t.disabled = true);
 
   if (term === current.answer) {
+    blasterRoundActive = false;
+    const allTargets = document.querySelectorAll('.blaster-target');
+    allTargets.forEach(t => t.disabled = true);
     btn.classList.add('correct-hit');
     blasterScore++;
     document.getElementById('blasterScore').textContent = blasterScore.toString();
@@ -1539,8 +1577,8 @@ function hitTarget(btn, term) {
     setTimeout(loadBlasterRound, 360);
   } else {
     btn.classList.add('wrong-hit');
-    document.getElementById('blasterFeedback').textContent = `❌ Not quite. Correct target: ${current.answer}`;
-    setTimeout(loadBlasterRound, 500);
+    btn.disabled = true;
+    document.getElementById('blasterFeedback').textContent = '❌ Not that one. Keep trying before they escape.';
   }
 }
 
@@ -1557,6 +1595,7 @@ const sortItems = [
   { term: 'Cartilage', category: 'Connective' },
 ];
 let sortQueue = [], sortIdx = 0, sortScore = 0;
+let sortCurrent = null, sortLocked = false;
 
 function initSort() {
   sortQueue = shuffleArray(sortItems);
@@ -1570,28 +1609,48 @@ function initSort() {
 
 function loadSortItem() {
   if (sortIdx >= sortQueue.length) {
-    document.getElementById('sortTerm').textContent = 'Run complete!';
+    const zone = document.getElementById('sortDropZone');
+    if (zone) zone.innerHTML = '<div class="sort-drop-label">Incoming Term</div>';
     document.getElementById('sortRound').textContent = sortQueue.length.toString();
     const done = document.getElementById('sortComplete');
     done.textContent = `Sorted ${sortScore}/${sortQueue.length} correctly.`;
     done.classList.add('show');
+    sortCurrent = null;
+    sortLocked = true;
     return;
   }
-  const current = sortQueue[sortIdx];
-  document.getElementById('sortTerm').textContent = current.term;
+
+  sortCurrent = sortQueue[sortIdx];
+  sortLocked = false;
   document.getElementById('sortRound').textContent = (sortIdx + 1).toString();
+  const zone = document.getElementById('sortDropZone');
+  zone.innerHTML = '<div class="sort-drop-label">Incoming Term</div>';
+  const faller = document.createElement('div');
+  faller.className = 'sort-faller';
+  faller.textContent = sortCurrent.term;
+  faller.style.animationDuration = (4.4 + Math.random() * 1.6).toFixed(2) + 's';
+  faller.addEventListener('animationend', () => {
+    if (sortLocked) return;
+    sortLocked = true;
+    document.getElementById('sortFeedback').textContent = `⏱ Missed ${sortCurrent.term}. It dropped off screen.`;
+    sortIdx++;
+    setTimeout(loadSortItem, 350);
+  });
+  zone.appendChild(faller);
 }
 
 function submitSort(category) {
-  if (sortIdx >= sortQueue.length) return;
-  const current = sortQueue[sortIdx];
-  if (category === current.category) {
+  if (sortIdx >= sortQueue.length || sortLocked || !sortCurrent) return;
+  sortLocked = true;
+  if (category === sortCurrent.category) {
     sortScore++;
     document.getElementById('sortScore').textContent = sortScore.toString();
-    document.getElementById('sortFeedback').textContent = `✅ ${current.term} belongs to ${current.category}.`;
+    document.getElementById('sortFeedback').textContent = `✅ ${sortCurrent.term} belongs to ${sortCurrent.category}.`;
   } else {
-    document.getElementById('sortFeedback').textContent = `❌ ${current.term} is ${current.category}, not ${category}.`;
+    document.getElementById('sortFeedback').textContent = `❌ ${sortCurrent.term} is ${sortCurrent.category}, not ${category}.`;
   }
+  const zone = document.getElementById('sortDropZone');
+  zone.innerHTML = '<div class="sort-drop-label">Incoming Term</div>';
   sortIdx++;
   setTimeout(loadSortItem, 450);
 }

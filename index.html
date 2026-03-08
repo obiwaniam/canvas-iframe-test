@@ -1518,7 +1518,7 @@ function loadBlasterRound() {
     btn.textContent = term;
     btn.style.right = '-18%';
     btn.style.top = (12 + idx * 31) + 'px';
-    btn.style.animationDuration = (6 + Math.random() * 3).toFixed(2) + 's';
+    btn.style.animationDuration = (3.1 + Math.random() * 1.4).toFixed(2) + 's';
     btn.style.animationDelay = (Math.random() * 0.35).toFixed(2) + 's';
     btn.addEventListener('click', () => hitTarget(btn, term));
     area.appendChild(btn);
@@ -1536,11 +1536,11 @@ function hitTarget(btn, term) {
     document.getElementById('blasterScore').textContent = blasterScore.toString();
     document.getElementById('blasterFeedback').textContent = `✅ Correct: ${term}`;
     blasterIdx++;
-    setTimeout(loadBlasterRound, 650);
+    setTimeout(loadBlasterRound, 360);
   } else {
     btn.classList.add('wrong-hit');
     document.getElementById('blasterFeedback').textContent = `❌ Not quite. Correct target: ${current.answer}`;
-    setTimeout(loadBlasterRound, 850);
+    setTimeout(loadBlasterRound, 500);
   }
 }
 

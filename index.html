@@ -540,6 +540,34 @@
     line-height: 1.5;
   }
   .content-list li { margin-bottom: 0.2rem; }
+  .batch2-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.55rem;
+    margin-top: 0.65rem;
+  }
+  .batch2-card {
+    border: 1px dashed var(--primary-light);
+    border-radius: 10px;
+    background: #F8FBFF;
+    padding: 0.65rem 0.6rem;
+  }
+  .batch2-card .emoji {
+    font-size: 1.2rem;
+    display: block;
+    margin-bottom: 0.2rem;
+  }
+  .batch2-card .title {
+    font-size: 0.76rem;
+    font-weight: 700;
+    color: var(--primary);
+  }
+  .batch2-card .sub {
+    font-size: 0.72rem;
+    color: var(--text-muted);
+    margin-top: 0.15rem;
+    line-height: 1.4;
+  }
 
   /* === FOOTER === */
   .footer {
@@ -690,9 +718,26 @@
   </div>
 
   <div class="content-block">
-    <h2>Coming Soon: Quiz Batch 2</h2>
-    <p>Next update will add a second set of activities after this section, including longer scenario-based prompts and mixed-format checks for deeper review.</p>
-    <p>Placeholder section added so you can place regular instructional text between game batches inside the same iframe page.</p>
+    <h2>Batch 2 Preview (Next Section)</h2>
+    <p>Below is the scaffold for the second game set. We can keep regular lecture text between batches, then launch the next three activities without changing your Canvas iframe embed.</p>
+    <div class="batch2-grid">
+      <div class="batch2-card">
+        <span class="emoji">🧩</span>
+        <div class="title">Case Sort</div>
+        <div class="sub">Drag clues into the correct system bucket.</div>
+      </div>
+      <div class="batch2-card">
+        <span class="emoji">⚡</span>
+        <div class="title">Rapid Recall</div>
+        <div class="sub">Short timed prompts with streak scoring.</div>
+      </div>
+      <div class="batch2-card">
+        <span class="emoji">🧪</span>
+        <div class="title">Applied Mini-Scenario</div>
+        <div class="sub">Choose the best explanation in context.</div>
+      </div>
+    </div>
+    <p style="margin-top:0.55rem;">When you’re ready, we’ll implement these one by one in this section.</p>
   </div>
 
   <div class="footer">A&P Study Break — Pure HTML/CSS/JS • Embeddable via iframe in Canvas LMS</div>

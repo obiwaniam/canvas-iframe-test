@@ -733,6 +733,7 @@
     position: absolute;
     width: 300px;
     max-width: calc(100% - 32px);
+    max-height: calc(100% - 32px);
     border-radius: 18px;
     background: rgba(255,255,255,0.98);
     border: 1px solid var(--border);
@@ -740,6 +741,7 @@
     padding: 14px;
     z-index: 10;
     display: none;
+    overflow-y: auto;
   }
 
   .issue-card.show { display: block; }
@@ -800,6 +802,37 @@
   .issue-feedback.show { display: block; }
   .issue-feedback.correct { color: var(--success); font-weight: 700; }
   .issue-feedback.wrong { color: var(--accent); font-weight: 700; }
+
+  .issue-feedback-copy {
+    display: block;
+    margin-top: 4px;
+    color: var(--text);
+    font-weight: 600;
+  }
+
+  .issue-responsibility {
+    margin-top: 12px;
+    padding: 10px 12px;
+    border-radius: 14px;
+    background: #eff6ff;
+    border: 1px solid #bfdbfe;
+  }
+
+  .issue-responsibility-label {
+    display: block;
+    font-size: 12px;
+    font-weight: 800;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--primary);
+    margin-bottom: 4px;
+  }
+
+  .issue-responsibility-value {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--text);
+  }
 
   .issue-hint {
     font-size: 13px;
@@ -950,6 +983,7 @@ const rooms = {
         title: 'Water is collecting under the sink cabinet.',
         question: 'What is the best next step?',
         correct: 0,
+        responsibility: 'Joint',
         feedback: 'Catch the leak if needed, document it, and report or repair it promptly before the cabinet and floor are damaged.',
         choices: [
           'Place a container under the leak and report or repair it quickly.',
@@ -968,6 +1002,7 @@ const rooms = {
         title: 'A stain is spreading on the ceiling.',
         question: 'What should a learner do first?',
         correct: 0,
+        responsibility: 'Property owner',
         feedback: 'A ceiling stain may signal active moisture from above, so it should be documented and reported or inspected quickly.',
         choices: [
           'Document it and report or inspect it as a likely leak.',
@@ -986,6 +1021,7 @@ const rooms = {
         title: 'Dark buildup is collecting around the tub edge.',
         question: 'What is the smartest next action?',
         correct: 0,
+        responsibility: 'Joint',
         feedback: 'Minor buildup can sometimes be cleaned safely, but recurring moisture and ventilation issues should be addressed or reported.',
         choices: [
           'Clean it safely, improve ventilation, and report it if it keeps returning.',
@@ -1004,6 +1040,7 @@ const rooms = {
         title: 'An outlet near the sink looks damaged.',
         question: 'What should happen next?',
         correct: 2,
+        responsibility: 'Property owner',
         feedback: 'Damaged outlets near water are a safety concern and should not be used until repaired by the proper person.',
         choices: [
           'Tape over the damaged part and keep using it carefully.',
@@ -1029,6 +1066,7 @@ const rooms = {
         title: 'Water damage is visible inside the sink cabinet.',
         question: 'What is the best next move?',
         correct: 1,
+        responsibility: 'Joint',
         feedback: 'Visible water damage under a sink suggests an active or repeated leak, which should be reported or repaired before it worsens.',
         choices: [
           'Dry the cabinet and keep checking it during the month before deciding.',
@@ -1047,6 +1085,7 @@ const rooms = {
         title: 'Grease is collecting around the hood and backsplash.',
         question: 'What should a learner do next?',
         correct: 0,
+        responsibility: 'Resident',
         feedback: 'Grease buildup can become a fire hazard, so the area should be cleaned safely and regularly.',
         choices: [
           'Clean the grease buildup before it becomes a bigger safety issue.',
@@ -1065,6 +1104,7 @@ const rooms = {
         title: 'Too many cords are crowded into one outlet area.',
         question: 'What is the safer response?',
         correct: 1,
+        responsibility: 'Resident',
         feedback: 'Overloading an outlet can create a fire risk, so devices should be reduced and plugged in more safely.',
         choices: [
           'Move one plug halfway out so the outlet is not technically full.',
@@ -1083,6 +1123,7 @@ const rooms = {
         title: 'The smoke alarm needs attention.',
         question: 'What is the best next step?',
         correct: 1,
+        responsibility: 'Joint',
         feedback: 'Smoke alarms should be maintained promptly because they protect people during kitchen fire emergencies.',
         choices: [
           'Silence it for now and plan to deal with it during the next home project day.',
@@ -1108,6 +1149,7 @@ const rooms = {
         title: 'Lint is collecting around the dryer vent area.',
         question: 'What should happen next?',
         correct: 0,
+        responsibility: 'Resident',
         feedback: 'Lint buildup increases fire risk, so the area and vent path should be cleaned and kept clear.',
         choices: [
           'Clean the lint and keep the vent area clear.',
@@ -1126,6 +1168,7 @@ const rooms = {
         title: 'Water is visible on the floor near the machines.',
         question: 'What is the best first action?',
         correct: 2,
+        responsibility: 'Joint',
         feedback: 'Water near appliances is a slip and damage risk, so it should be addressed and traced to the source quickly.',
         choices: [
           'Mop it up and continue laundry without looking for the source right away.',
@@ -1144,6 +1187,7 @@ const rooms = {
         title: 'The washer connection area may be leaking or stressed.',
         question: 'What should a learner do next?',
         correct: 2,
+        responsibility: 'Property owner',
         feedback: 'Washer hoses and hookups should be checked promptly because a failed hose can cause major water damage.',
         choices: [
           'Tighten what you can see and assume the rest is probably fine.',
@@ -1162,6 +1206,7 @@ const rooms = {
         title: 'The outlet area is crowded with plugs.',
         question: 'What is the safest response?',
         correct: 1,
+        responsibility: 'Resident',
         feedback: 'Laundry areas use high-power appliances, so overloaded outlets should be reduced and used carefully.',
         choices: [
           'Leave it as-is but avoid using the extra devices very often.',
@@ -1180,6 +1225,7 @@ const rooms = {
         title: 'Possible pest droppings are visible near the utility sink.',
         question: 'What should a renter or homeowner do next?',
         correct: 1,
+        responsibility: 'Joint',
         feedback: 'Pest droppings should be documented and reported or addressed promptly, with cleanup handled safely after the problem is managed.',
         choices: [
           'Sweep them aside for now and wait to see whether more appear next month.',
@@ -1314,6 +1360,22 @@ function placeIssueCard(issueCard, issue) {
   issueCard.style.top = `${clampedTop}px`;
 }
 
+function refreshIssueCardPlacement() {
+  const issue = getActiveIssue();
+  const issueCard = document.getElementById('issueCard');
+  if (!issue || !issueCard.classList.contains('show')) return;
+  requestAnimationFrame(() => placeIssueCard(issueCard, issue));
+}
+
+function renderResponsibility(issue) {
+  return `
+    <div class="issue-responsibility">
+      <span class="issue-responsibility-label">Responsibility</span>
+      <div class="issue-responsibility-value">${issue.responsibility || 'Joint'}</div>
+    </div>
+  `;
+}
+
 function openIssue(issueId) {
   activeIssueId = issueId;
   const issue = getActiveIssue();
@@ -1354,6 +1416,7 @@ function chooseAnswer(choiceIndex, clickedButton) {
     clickedButton.classList.add('wrong');
     issueFeedback.className = 'issue-feedback show wrong';
     issueFeedback.textContent = 'Not quite. Try another answer.';
+    refreshIssueCardPlacement();
   } else {
     allButtons.forEach((button) => {
       button.disabled = true;
@@ -1363,7 +1426,12 @@ function chooseAnswer(choiceIndex, clickedButton) {
     renderHotspots();
     updateProgress();
     issueFeedback.className = 'issue-feedback show correct';
-    issueFeedback.textContent = issue.feedback;
+    issueFeedback.innerHTML = `
+      Correct.
+      <span class="issue-feedback-copy">${issue.feedback}</span>
+      ${renderResponsibility(issue)}
+    `;
+    refreshIssueCardPlacement();
     if (isRoomComplete(activeRoomId)) {
       closeIssueCard();
       showRoomCompleteBanner();

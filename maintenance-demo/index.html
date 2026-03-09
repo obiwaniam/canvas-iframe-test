@@ -530,74 +530,442 @@
       min-height: 560px;
     }
   }
+
+  .presenter-strip {
+    border: 1px solid var(--border);
+    background: rgba(255,255,255,0.75);
+    backdrop-filter: blur(10px);
+    border-radius: 18px;
+    padding: 14px 16px;
+    margin-bottom: 18px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 14px;
+    font-size: 15px;
+  }
+
+  .presenter-strip strong { color: var(--primary); }
+
+  .stage-card {
+    min-height: 760px;
+  }
+
+  .screen { display: none; }
+  .screen.active { display: block; }
+
+  .floorplan-shell {
+    display: grid;
+    grid-template-columns: 1.15fr 0.85fr;
+    gap: 16px;
+    align-items: stretch;
+  }
+
+  .house-map {
+    position: relative;
+    min-height: 600px;
+    border-radius: 18px;
+    background: linear-gradient(180deg, #f8fbff 0%, #eef6ff 100%);
+    border: 1px solid var(--border);
+    padding: 18px;
+    overflow: hidden;
+  }
+
+  .house-outline {
+    position: absolute;
+    inset: 22px;
+    border-radius: 22px;
+    border: 3px solid #bfdbfe;
+    background: rgba(255,255,255,0.8);
+  }
+
+  .map-room {
+    position: absolute;
+    border: 2px solid #bfdbfe;
+    background: linear-gradient(180deg, #ffffff, #eff6ff);
+    border-radius: 20px;
+    padding: 18px;
+    text-align: left;
+    cursor: pointer;
+    transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
+    box-shadow: 0 10px 24px rgba(59,130,246,0.08);
+  }
+
+  .map-room:hover {
+    transform: translateY(-2px);
+    border-color: var(--primary-light);
+    box-shadow: 0 14px 30px rgba(59,130,246,0.14);
+  }
+
+  .map-room.active {
+    border-color: var(--primary);
+    box-shadow: 0 16px 32px rgba(29,78,216,0.18);
+  }
+
+  .map-room h3 {
+    font-size: 28px;
+    margin-bottom: 6px;
+  }
+
+  .map-room p {
+    font-size: 14px;
+    color: var(--muted);
+    margin-bottom: 12px;
+    line-height: 1.35;
+  }
+
+  .map-room .meta {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--primary);
+    background: #eff6ff;
+    border-radius: 999px;
+    padding: 7px 10px;
+  }
+
+  .map-bathroom {
+    top: 62px;
+    left: 54px;
+    width: 40%;
+    height: 210px;
+  }
+
+  .map-kitchen {
+    top: 62px;
+    right: 54px;
+    width: 43%;
+    height: 250px;
+  }
+
+  .map-laundry {
+    left: 54px;
+    right: 54px;
+    bottom: 52px;
+    height: 210px;
+  }
+
+  .room-side-notes {
+    display: grid;
+    gap: 12px;
+  }
+
+  .note-card {
+    border: 1px solid var(--border);
+    border-radius: 18px;
+    background: #f8fbff;
+    padding: 16px;
+  }
+
+  .note-card h3 {
+    font-size: 18px;
+    margin-bottom: 8px;
+  }
+
+  .note-card p,
+  .note-card li {
+    color: var(--muted);
+    font-size: 14px;
+    line-height: 1.45;
+  }
+
+  .note-card ul {
+    margin: 10px 0 0 18px;
+    display: grid;
+    gap: 8px;
+  }
+
+  .room-toolbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 14px;
+    flex-wrap: wrap;
+  }
+
+  .room-chip-row {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+
+  .room-chip {
+    border: 2px solid var(--border);
+    background: #fff;
+    border-radius: 999px;
+    padding: 10px 14px;
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--text);
+    cursor: pointer;
+    transition: all 0.16s ease;
+  }
+
+  .room-chip.active {
+    border-color: var(--primary);
+    color: var(--primary);
+    background: #eff6ff;
+  }
+
+  .scene-meta {
+    margin-bottom: 12px;
+  }
+
+  .scene-meta h3 {
+    font-size: 30px;
+    margin-bottom: 4px;
+  }
+
+  .scene-meta p {
+    color: var(--muted);
+    font-size: 15px;
+  }
+
+  .scene-frame {
+    position: relative;
+    min-height: 640px;
+    border-radius: 20px;
+    overflow: hidden;
+    border: 1px solid var(--border);
+    background: #e2e8f0;
+  }
+
+  .scene-image {
+    width: 100%;
+    height: 100%;
+    min-height: 640px;
+    object-fit: cover;
+    display: block;
+  }
+
+  .scene-hotspots {
+    position: absolute;
+    inset: 0;
+  }
+
+  .room-hotspot {
+    position: absolute;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    border: 3px solid #fff;
+    background: radial-gradient(circle, rgba(239,68,68,0.95) 0, rgba(220,38,38,0.78) 60%, rgba(127,29,29,0.15) 100%);
+    box-shadow: 0 0 0 0 rgba(239,68,68,0.45);
+    animation: pulse 1.8s infinite;
+    color: #fff;
+    font-size: 20px;
+    font-weight: 800;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transform: translate(-50%, -50%);
+    transition: transform 0.15s ease;
+  }
+
+  .room-hotspot:hover { transform: translate(-50%, -50%) scale(1.08); }
+
+  .room-hotspot.solved {
+    background: radial-gradient(circle, rgba(34,197,94,0.95) 0, rgba(22,163,74,0.85) 60%, rgba(20,83,45,0.18) 100%);
+    animation: none;
+  }
+
+  .room-hotspot-label {
+    position: absolute;
+    top: 54px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(17,24,39,0.88);
+    color: #fff;
+    padding: 6px 9px;
+    border-radius: 999px;
+    font-size: 12px;
+    white-space: nowrap;
+    pointer-events: none;
+  }
+
+  .panel-stat-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+    margin-bottom: 16px;
+  }
+
+  .panel-stat {
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    background: #f8fbff;
+    padding: 12px;
+  }
+
+  .panel-stat .label {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--muted);
+    margin-bottom: 4px;
+  }
+
+  .panel-stat .value {
+    font-size: 24px;
+    font-weight: 800;
+    color: var(--primary);
+  }
+
+  .room-summary-list {
+    display: grid;
+    gap: 8px;
+    margin-bottom: 14px;
+  }
+
+  .room-summary-item {
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    background: #fff;
+    padding: 10px 12px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    font-size: 14px;
+  }
+
+  .room-summary-item strong { color: var(--text); }
+
+  .room-summary-item span {
+    color: var(--primary);
+    font-weight: 700;
+  }
+
+  @media (max-width: 1020px) {
+    .floorplan-shell {
+      grid-template-columns: 1fr;
+    }
+
+    .house-map {
+      min-height: 520px;
+    }
+
+    .map-room h3 {
+      font-size: 24px;
+    }
+  }
 </style>
 </head>
 <body>
 <div class="app">
   <div class="hero">
     <div class="tag">Presentation Demo</div>
-    <h1>Spot It, Then Decide</h1>
-    <p>Basic Home Maintenance for Renters (and New Homeowners)</p>
+    <h1>Home Maintenance Challenge</h1>
+    <p>Choose a room, spot visible issues, and decide what a renter or new homeowner should do next.</p>
+  </div>
+
+  <div class="presenter-strip">
+    <div><strong>Big-screen flow:</strong> Start on the floorplan, open any room, click one hotspot, and choose one action to show how the learning works.</div>
+    <div class="score-pill">Solved overall: <span id="solvedCount">0</span>/<span id="totalIssues">12</span></div>
   </div>
 
   <div class="layout">
-    <div class="room-card">
+    <div class="room-card stage-card">
       <div class="room-header">
         <div>
-          <h2>Bathroom Safety Scene</h2>
-          <div class="small-note">Click any pulsing problem, then choose the best next step.</div>
+          <h2 id="stageTitle">Choose a Room</h2>
+          <div class="small-note" id="stageNote">Start on the floorplan, then open a room photo to investigate visible issues.</div>
         </div>
-        <div class="score-pill">Solved: <span id="solvedCount">0</span>/4</div>
+        <div class="score-pill" id="roomProgressPill">Room progress: --</div>
       </div>
 
-      <div class="room">
-        <div class="wall-line"></div>
-        <div class="floor"></div>
-        <div class="mirror"></div>
-        <div class="sink"></div>
-        <div class="cabinet"></div>
-        <div class="toilet">
-          <div class="toilet-tank"></div>
-          <div class="toilet-bowl"></div>
-          <div class="toilet-base"></div>
+      <div class="screen active" id="floorplanScreen">
+        <div class="floorplan-shell">
+          <div class="house-map">
+            <div class="house-outline"></div>
+
+            <button class="map-room map-bathroom" id="map-bathroom" onclick="openRoom('bathroom')">
+              <h3>Bathroom</h3>
+              <p>Water, mold, and electrical safety issues in a wet space.</p>
+              <div class="meta"><span>Open room</span> <span id="map-progress-bathroom">0/4 solved</span></div>
+            </button>
+
+            <button class="map-room map-kitchen" id="map-kitchen" onclick="openRoom('kitchen')">
+              <h3>Kitchen</h3>
+              <p>Leaks, grease, power safety, and appliance-area decisions.</p>
+              <div class="meta"><span>Open room</span> <span id="map-progress-kitchen">0/4 solved</span></div>
+            </button>
+
+            <button class="map-room map-laundry" id="map-laundry" onclick="openRoom('laundry')">
+              <h3>Laundry</h3>
+              <p>Lint, hoses, puddles, and utility-room hazards that need quick judgment.</p>
+              <div class="meta"><span>Open room</span> <span id="map-progress-laundry">0/4 solved</span></div>
+            </button>
+          </div>
+
+          <div class="room-side-notes">
+            <div class="note-card">
+              <h3>Why this format lands well</h3>
+              <p>The floorplan makes the experience feel like a guided simulation, while the photo rooms create a stronger first impression than abstract graphics.</p>
+            </div>
+            <div class="note-card">
+              <h3>What the learner does</h3>
+              <ul>
+                <li>Choose a room from the floorplan.</li>
+                <li>Click a visible problem area.</li>
+                <li>Decide the best next action.</li>
+                <li>See instant practical feedback.</li>
+              </ul>
+            </div>
+            <div class="note-card">
+              <h3>Presentation note</h3>
+              <p>Every issue includes one silly answer so the interaction feels playful without losing the practical learning goal.</p>
+            </div>
+          </div>
         </div>
-        <div class="curtain"></div>
-        <div class="tub"></div>
-        <div class="ceiling-stain"></div>
-        <div class="outlet"></div>
+      </div>
 
-        <button class="hotspot" id="hotspot-leak" style="left: 120px; top: 345px;" onclick="openScenario('leak')">
-          !
-          <span class="hotspot-label">Leak under sink</span>
-        </button>
+      <div class="screen" id="roomScreen">
+        <div class="room-toolbar">
+          <div class="room-chip-row" id="roomChipRow"></div>
+          <button class="tool-btn tool-ghost" onclick="showFloorplan()">Back to Floorplan</button>
+        </div>
 
-        <button class="hotspot" id="hotspot-stain" style="left: 446px; top: 36px;" onclick="openScenario('stain')">
-          !
-          <span class="hotspot-label">Ceiling stain</span>
-        </button>
-
-        <button class="hotspot" id="hotspot-mold" style="right: 118px; top: 158px;" onclick="openScenario('mold')">
-          !
-          <span class="hotspot-label">Mold by tub</span>
-        </button>
-
-        <button class="hotspot" id="hotspot-outlet" style="right: 346px; top: 270px;" onclick="openScenario('outlet')">
-          !
-          <span class="hotspot-label">Unsafe outlet</span>
-        </button>
+        <div class="scene-wrap">
+          <div class="scene-meta">
+            <h3 id="sceneName">Bathroom</h3>
+            <p id="sceneSubtitle">Spot visible maintenance issues, then decide the best next step.</p>
+          </div>
+          <div class="scene-frame">
+            <img class="scene-image" id="sceneImage" src="" alt="Selected room scene">
+            <div class="scene-hotspots" id="hotspotLayer"></div>
+          </div>
+        </div>
       </div>
     </div>
 
     <div class="panel">
       <h2>What Should You Do?</h2>
-      <p class="panel-intro">
-        This demo is built for fast, visual decision-making. Each hotspot checks whether the learner knows not just what the problem is, but what action comes next.
+      <p class="panel-intro" id="panelIntro">
+        Start with the floorplan. The experience is meant to feel like a realistic walkthrough rather than a conventional quiz.
       </p>
 
-      <div class="scenario-tag" id="scenarioTag">Pick a hotspot</div>
-      <div class="scenario-title" id="scenarioTitle">Choose a pulsing problem in the room.</div>
+      <div class="panel-stat-grid">
+        <div class="panel-stat">
+          <div class="label">Current Room</div>
+          <div class="value" id="currentRoomValue">Floorplan</div>
+        </div>
+        <div class="panel-stat">
+          <div class="label">Room Solved</div>
+          <div class="value" id="currentRoomSolvedValue">0/4</div>
+        </div>
+      </div>
+
+      <div class="room-summary-list" id="roomSummaryList"></div>
+
+      <div class="scenario-tag" id="scenarioTag">Choose a room</div>
+      <div class="scenario-title" id="scenarioTitle">Open Bathroom, Kitchen, or Laundry.</div>
       <div class="scenario-question" id="scenarioQuestion">
-        Once you click a hotspot, action choices will appear here.
+        After you enter a room, click a pulsing issue in the photo to reveal the decision choices.
       </div>
 
       <div class="choices" id="choices"></div>
@@ -605,19 +973,19 @@
       <div class="feedback" id="feedbackBox">
         <div class="feedback-title">Demo Ready</div>
         <div class="feedback-text">
-          For the presentation, click one hotspot and one answer. That is enough to show an engaging, applied-learning interaction on a big screen.
+          For the presentation, you only need one room and one decision to make the interaction feel lively and practical on a big screen.
         </div>
       </div>
 
       <div class="footer-tools">
-        <button class="tool-btn tool-primary" onclick="openScenario('leak')">Start With Leak</button>
+        <button class="tool-btn tool-primary" onclick="openRoom('bathroom')">Open Bathroom First</button>
         <button class="tool-btn tool-ghost" onclick="resetDemo()">Reset Demo</button>
       </div>
 
       <div class="legend">
         <div class="legend-item">
           <strong>Why this works</strong>
-          Big visuals, fast interaction, and clear real-world choices make the learning feel immediate.
+          The learner has to identify the issue and choose the right response, which makes the activity feel applied instead of passive.
         </div>
         <div class="legend-item">
           <strong>Playful touch</strong>
@@ -629,144 +997,409 @@
 </div>
 
 <script>
-const scenarios = {
-  leak: {
-    label: 'Leak Under Sink',
-    title: 'Water is collecting under the bathroom sink.',
-    question: 'What is the best next step for a renter or new homeowner?',
-    correct: 1,
-    feedback: 'Report or address the leak quickly. Even a small drip can damage cabinets, flooring, and walls if ignored.',
-    choices: [
-      'Close the cabinet door and pretend you never saw it.',
-      'Place a bucket under it, document it, and report the leak promptly.',
-      'Pour more water down the drain to see if it gets better.',
-      'Tape a motivational quote to the pipe and hope it repairs itself.'
+const rooms = {
+  bathroom: {
+    name: 'Bathroom',
+    subtitle: 'Water, mold, and electrical safety issues in a wet, high-risk room.',
+    image: 'maintenance-demo/assets/bathroom-photo.png',
+    issues: [
+      {
+        id: 'bathroom-leak',
+        label: 'Leak under sink',
+        left: 78,
+        top: 84,
+        title: 'Water is collecting under the sink cabinet.',
+        question: 'What is the best next step?',
+        correct: 0,
+        feedback: 'Catch the leak if needed, document it, and report or repair it promptly before the cabinet and floor are damaged.',
+        choices: [
+          'Place a container under the leak and report or repair it quickly.',
+          'Dry the area and wait a few weeks to see whether it gets worse first.',
+          'Keep using the sink but open the cabinet so it can air out.',
+          'Offer the leak a tiny umbrella and call it weatherproofing.'
+        ]
+      },
+      {
+        id: 'bathroom-stain',
+        label: 'Ceiling stain',
+        left: 60,
+        top: 10,
+        title: 'A stain is spreading on the ceiling.',
+        question: 'What should a learner do first?',
+        correct: 0,
+        feedback: 'A ceiling stain may signal active moisture from above, so it should be documented and reported or inspected quickly.',
+        choices: [
+          'Document it and report or inspect it as a likely leak.',
+          'Clean the surface and repaint it without checking for moisture first.',
+          'Wait to report it until the stain spreads farther across the ceiling.',
+          'Name the stain "Cumulus" and market it as ceiling art.'
+        ]
+      },
+      {
+        id: 'bathroom-mold',
+        label: 'Mold near tub',
+        left: 17,
+        top: 92,
+        title: 'Dark buildup is collecting around the tub edge.',
+        question: 'What is the smartest next action?',
+        correct: 0,
+        feedback: 'Minor buildup can sometimes be cleaned safely, but recurring moisture and ventilation issues should be addressed or reported.',
+        choices: [
+          'Clean it safely, improve ventilation, and report it if it keeps returning.',
+          'Wipe only the visible area and leave the bathroom ventilation habits unchanged.',
+          'Spray a strong cleaner once and assume the moisture problem is permanently solved.',
+          'Ask the mold to pay rent if it plans to stay.'
+        ]
+      },
+      {
+        id: 'bathroom-outlet',
+        label: 'Unsafe outlet',
+        left: 92,
+        top: 38,
+        title: 'An outlet near the sink looks damaged.',
+        question: 'What should happen next?',
+        correct: 2,
+        feedback: 'Damaged outlets near water are a safety concern and should not be used until repaired by the proper person.',
+        choices: [
+          'Tape over the damaged part and keep using it carefully.',
+          'Avoid using high-power items there, but keep the outlet in service for small devices.',
+          'Stop using it and report or repair it right away.',
+          'Challenge the outlet to a duel and let electricity decide.'
+        ]
+      }
     ]
   },
-  stain: {
-    label: 'Ceiling Water Stain',
-    title: 'There is a brown stain spreading across the ceiling.',
-    question: 'What should the learner do first?',
-    correct: 2,
-    feedback: 'A spreading ceiling stain can signal an active leak above. It should be reported or inspected before the damage spreads.',
-    choices: [
-      'Ignore it unless it starts looking expensive.',
-      'Paint over it immediately and call it solved.',
-      'Document the stain and report or inspect it as a likely moisture problem.',
-      'Hang a poster over it and rename it modern decor.'
+  kitchen: {
+    name: 'Kitchen',
+    subtitle: 'Leaks, overloaded power, and fire-risk clues in a high-use room.',
+    image: 'maintenance-demo/assets/kitchen-photo.png',
+    issues: [
+      {
+        id: 'kitchen-leak',
+        label: 'Under-sink leak',
+        left: 36,
+        top: 69,
+        title: 'Water damage is visible inside the sink cabinet.',
+        question: 'What is the best next move?',
+        correct: 1,
+        feedback: 'Visible water damage under a sink suggests an active or repeated leak, which should be reported or repaired before it worsens.',
+        choices: [
+          'Dry the cabinet and keep checking it during the month before deciding.',
+          'Document the moisture and report or repair the leak promptly.',
+          'Line the cabinet with towels and continue using the sink for now.',
+          'Install a tiny canoe under the sink to manage future puddles.'
+        ]
+      },
+      {
+        id: 'kitchen-grease',
+        label: 'Grease buildup',
+        left: 77,
+        top: 24,
+        title: 'Grease is collecting around the hood and backsplash.',
+        question: 'What should a learner do next?',
+        correct: 0,
+        feedback: 'Grease buildup can become a fire hazard, so the area should be cleaned safely and regularly.',
+        choices: [
+          'Clean the grease buildup before it becomes a bigger safety issue.',
+          'Wait until the next deep-cleaning day so you only have to tackle it once.',
+          'Focus on the stovetop only and ignore the hood area for now.',
+          'Label it "chef confetti" and include it in the decor.'
+        ]
+      },
+      {
+        id: 'kitchen-outlet',
+        label: 'Overloaded outlet',
+        left: 88,
+        top: 49,
+        title: 'Too many cords are crowded into one outlet area.',
+        question: 'What is the safer response?',
+        correct: 1,
+        feedback: 'Overloading an outlet can create a fire risk, so devices should be reduced and plugged in more safely.',
+        choices: [
+          'Move one plug halfway out so the outlet is not technically full.',
+          'Unplug extra devices and reduce the load on that outlet.',
+          'Keep everything plugged in, but avoid running more than one appliance at once.',
+          'Build the outlet a coffee schedule so the plugs can take turns.'
+        ]
+      },
+      {
+        id: 'kitchen-alarm',
+        label: 'Smoke alarm attention',
+        left: 61,
+        top: 8,
+        title: 'The smoke alarm needs attention.',
+        question: 'What is the best next step?',
+        correct: 1,
+        feedback: 'Smoke alarms should be maintained promptly because they protect people during kitchen fire emergencies.',
+        choices: [
+          'Silence it for now and plan to deal with it during the next home project day.',
+          'Check and maintain the smoke alarm right away.',
+          'Ignore it as long as there is another alarm somewhere else in the home.',
+          'Compliment its rhythm and recruit it for the school pep band.'
+        ]
+      }
     ]
   },
-  mold: {
-    label: 'Mold Around Tub',
-    title: 'Dark mold-like spots are appearing near the tub and wall edge.',
-    question: 'What is the smartest next action?',
-    correct: 0,
-    feedback: 'Minor surface buildup can sometimes be cleaned safely, but recurring moisture and ventilation problems should also be reported.',
-    choices: [
-      'Clean the area safely, improve ventilation, and report it if it keeps returning.',
-      'Spray perfume on it so the bathroom smells fresher.',
-      'Seal it in with a bath towel and hope nobody notices.',
-      'Assume all mold is decorative and leave it alone.'
-    ]
-  },
-  outlet: {
-    label: 'Unsafe Bathroom Outlet',
-    title: 'An outlet near water looks damaged and unsafe.',
-    question: 'What should happen next?',
-    correct: 3,
-    feedback: 'Damaged electrical outlets near water are a safety issue. Avoid using them and report them for repair immediately.',
-    choices: [
-      'Test it with wet hands so you can be extra sure.',
-      'Plug in more things to see if the problem is real.',
-      'Cover it with a washcloth and continue your day.',
-      'Stop using it and report it right away because it may be hazardous.'
+  laundry: {
+    name: 'Laundry',
+    subtitle: 'Lint, hoses, puddles, and utility-room hazards that need quick judgment.',
+    image: 'maintenance-demo/assets/laundry-photo.png',
+    issues: [
+      {
+        id: 'laundry-lint',
+        label: 'Lint buildup',
+        left: 92,
+        top: 80,
+        title: 'Lint is collecting around the dryer vent area.',
+        question: 'What should happen next?',
+        correct: 0,
+        feedback: 'Lint buildup increases fire risk, so the area and vent path should be cleaned and kept clear.',
+        choices: [
+          'Clean the lint and keep the vent area clear.',
+          'Vacuum only the visible lint and leave the vent area for a later check.',
+          'Run one more dryer cycle before cleaning so you can tackle it all at once.',
+          'Give the lint pile a name tag and invite it to staff meetings.'
+        ]
+      },
+      {
+        id: 'laundry-puddle',
+        label: 'Water on floor',
+        left: 67,
+        top: 86,
+        title: 'Water is visible on the floor near the machines.',
+        question: 'What is the best first action?',
+        correct: 2,
+        feedback: 'Water near appliances is a slip and damage risk, so it should be addressed and traced to the source quickly.',
+        choices: [
+          'Mop it up and continue laundry without looking for the source right away.',
+          'Place a towel over it and check again tomorrow.',
+          'Clean it up and inspect or report the source of the leak.',
+          'Put up a "water feature" sign and charge admission.'
+        ]
+      },
+      {
+        id: 'laundry-hose',
+        label: 'Washer hose concern',
+        left: 63,
+        top: 48,
+        title: 'The washer connection area may be leaking or stressed.',
+        question: 'What should a learner do next?',
+        correct: 2,
+        feedback: 'Washer hoses and hookups should be checked promptly because a failed hose can cause major water damage.',
+        choices: [
+          'Tighten what you can see and assume the rest is probably fine.',
+          'Keep using the washer but check the hose again after a few more loads.',
+          'Inspect or report the hose connection before it fails further.',
+          'Give the hose an inspirational speech about pressure management.'
+        ]
+      },
+      {
+        id: 'laundry-outlet',
+        label: 'Outlet load',
+        left: 68,
+        top: 26,
+        title: 'The outlet area is crowded with plugs.',
+        question: 'What is the safest response?',
+        correct: 1,
+        feedback: 'Laundry areas use high-power appliances, so overloaded outlets should be reduced and used carefully.',
+        choices: [
+          'Leave it as-is but avoid using the extra devices very often.',
+          'Reduce the number of plugged-in devices and avoid overloading it.',
+          'Keep all devices connected, but spread them more neatly around the outlet.',
+          'Train the outlet for endurance so it can achieve its dreams.'
+        ]
+      }
     ]
   }
 };
 
-let currentScenarioId = null;
-const solved = new Set();
+const roomOrder = ['bathroom', 'kitchen', 'laundry'];
+const solvedByRoom = Object.fromEntries(roomOrder.map((roomId) => [roomId, new Set()]));
+let activeRoomId = null;
+let activeIssueId = null;
 
-function renderChoices(scenarioId) {
-  const scenario = scenarios[scenarioId];
-  const choicesBox = document.getElementById('choices');
-  choicesBox.innerHTML = '';
-
-  scenario.choices.forEach((choice, index) => {
-    const button = document.createElement('button');
-    button.className = 'choice-btn';
-    button.textContent = choice;
-    button.addEventListener('click', () => chooseAnswer(scenarioId, index, button));
-    choicesBox.appendChild(button);
-  });
+function totalSolvedCount() {
+  return roomOrder.reduce((sum, roomId) => sum + solvedByRoom[roomId].size, 0);
 }
 
-function openScenario(scenarioId) {
-  currentScenarioId = scenarioId;
-  const scenario = scenarios[scenarioId];
-  document.getElementById('scenarioTag').textContent = scenario.label;
-  document.getElementById('scenarioTitle').textContent = scenario.title;
-  document.getElementById('scenarioQuestion').textContent = scenario.question;
-
-  const feedbackBox = document.getElementById('feedbackBox');
-  feedbackBox.className = 'feedback';
-  feedbackBox.innerHTML = `
-    <div class="feedback-title">Choose an Action</div>
-    <div class="feedback-text">This scene is designed to spark a quick decision. Which action best protects the home and the person living in it?</div>
-  `;
-
-  renderChoices(scenarioId);
+function issueCount(roomId) {
+  return rooms[roomId].issues.length;
 }
 
-function chooseAnswer(scenarioId, choiceIndex, clickedButton) {
-  const scenario = scenarios[scenarioId];
-  const allButtons = Array.from(document.querySelectorAll('.choice-btn'));
-  const feedbackBox = document.getElementById('feedbackBox');
+function updateProgress() {
+  document.getElementById('solvedCount').textContent = totalSolvedCount().toString();
+  document.getElementById('totalIssues').textContent = roomOrder.reduce((sum, roomId) => sum + issueCount(roomId), 0).toString();
 
-  allButtons.forEach((button, index) => {
-    button.disabled = true;
-    if (index === scenario.correct) {
-      button.classList.add('correct');
+  roomOrder.forEach((roomId) => {
+    const progress = `${solvedByRoom[roomId].size}/${issueCount(roomId)} solved`;
+    const el = document.getElementById(`map-progress-${roomId}`);
+    if (el) el.textContent = progress;
+
+    const mapButton = document.getElementById(`map-${roomId}`);
+    if (mapButton) {
+      mapButton.classList.toggle('active', activeRoomId === roomId);
     }
   });
 
-  if (choiceIndex !== scenario.correct) {
-    clickedButton.classList.add('wrong');
-  } else {
-    solved.add(scenarioId);
-    const hotspot = document.getElementById(`hotspot-${scenarioId}`);
-    if (hotspot) hotspot.classList.add('solved');
-    document.getElementById('solvedCount').textContent = solved.size.toString();
-  }
+  const summary = document.getElementById('roomSummaryList');
+  summary.innerHTML = '';
+  roomOrder.forEach((roomId) => {
+    const item = document.createElement('div');
+    item.className = 'room-summary-item';
+    item.innerHTML = `<strong>${rooms[roomId].name}</strong><span>${solvedByRoom[roomId].size}/${issueCount(roomId)}</span>`;
+    summary.appendChild(item);
+  });
 
-  feedbackBox.className = 'feedback ' + (choiceIndex === scenario.correct ? 'correct' : 'wrong');
-  feedbackBox.innerHTML = `
-    <div class="feedback-title">${choiceIndex === scenario.correct ? 'Correct Decision' : 'Try Again Later'}</div>
-    <div class="feedback-text">${scenario.feedback}</div>
-  `;
+  if (activeRoomId) {
+    document.getElementById('currentRoomValue').textContent = rooms[activeRoomId].name;
+    document.getElementById('currentRoomSolvedValue').textContent = `${solvedByRoom[activeRoomId].size}/${issueCount(activeRoomId)}`;
+    document.getElementById('roomProgressPill').textContent = `Room progress: ${solvedByRoom[activeRoomId].size}/${issueCount(activeRoomId)}`;
+  } else {
+    document.getElementById('currentRoomValue').textContent = 'Floorplan';
+    document.getElementById('currentRoomSolvedValue').textContent = '--';
+    document.getElementById('roomProgressPill').textContent = 'Room progress: --';
+  }
 }
 
-function resetDemo() {
-  solved.clear();
-  document.getElementById('solvedCount').textContent = '0';
-  Object.keys(scenarios).forEach((id) => {
-    const hotspot = document.getElementById(`hotspot-${id}`);
-    if (hotspot) hotspot.classList.remove('solved');
-  });
-  currentScenarioId = null;
-  document.getElementById('scenarioTag').textContent = 'Pick a hotspot';
-  document.getElementById('scenarioTitle').textContent = 'Choose a pulsing problem in the room.';
-  document.getElementById('scenarioQuestion').textContent = 'Once you click a hotspot, action choices will appear here.';
+function showFloorplan() {
+  activeRoomId = null;
+  activeIssueId = null;
+  document.getElementById('floorplanScreen').classList.add('active');
+  document.getElementById('roomScreen').classList.remove('active');
+  document.getElementById('stageTitle').textContent = 'Choose a Room';
+  document.getElementById('stageNote').textContent = 'Start on the floorplan, then open a room photo to investigate visible issues.';
+  document.getElementById('panelIntro').textContent = 'Start with the floorplan. The experience is meant to feel like a realistic walkthrough rather than a conventional quiz.';
+  document.getElementById('scenarioTag').textContent = 'Choose a room';
+  document.getElementById('scenarioTitle').textContent = 'Open Bathroom, Kitchen, or Laundry.';
+  document.getElementById('scenarioQuestion').textContent = 'After you enter a room, click a pulsing issue in the photo to reveal the decision choices.';
   document.getElementById('choices').innerHTML = '';
   const feedbackBox = document.getElementById('feedbackBox');
   feedbackBox.className = 'feedback';
   feedbackBox.innerHTML = `
     <div class="feedback-title">Demo Ready</div>
-    <div class="feedback-text">For the presentation, click one hotspot and one answer. That is enough to show an engaging, applied-learning interaction on a big screen.</div>
+    <div class="feedback-text">For the presentation, you only need one room and one decision to make the interaction feel lively and practical on a big screen.</div>
+  `;
+  updateProgress();
+}
+
+function renderRoomChips() {
+  const chipRow = document.getElementById('roomChipRow');
+  chipRow.innerHTML = '';
+  roomOrder.forEach((roomId) => {
+    const chip = document.createElement('button');
+    chip.className = 'room-chip' + (roomId === activeRoomId ? ' active' : '');
+    chip.textContent = `${rooms[roomId].name} (${solvedByRoom[roomId].size}/${issueCount(roomId)})`;
+    chip.addEventListener('click', () => openRoom(roomId));
+    chipRow.appendChild(chip);
+  });
+}
+
+function renderHotspots() {
+  const layer = document.getElementById('hotspotLayer');
+  layer.innerHTML = '';
+  const room = rooms[activeRoomId];
+  room.issues.forEach((issue) => {
+    const button = document.createElement('button');
+    button.className = 'room-hotspot' + (solvedByRoom[activeRoomId].has(issue.id) ? ' solved' : '');
+    button.style.left = `${issue.left}%`;
+    button.style.top = `${issue.top}%`;
+    button.innerHTML = `${solvedByRoom[activeRoomId].has(issue.id) ? '✓' : '!'}<span class="room-hotspot-label">${issue.label}</span>`;
+    button.addEventListener('click', () => openIssue(issue.id));
+    layer.appendChild(button);
+  });
+}
+
+function openRoom(roomId) {
+  activeRoomId = roomId;
+  activeIssueId = null;
+  document.getElementById('floorplanScreen').classList.remove('active');
+  document.getElementById('roomScreen').classList.add('active');
+  document.getElementById('stageTitle').textContent = `${rooms[roomId].name} Scene`;
+  document.getElementById('stageNote').textContent = 'Click a hotspot in the photo, then decide the best next action.';
+  document.getElementById('panelIntro').textContent = `You are now in the ${rooms[roomId].name.toLowerCase()}. Click a visible issue in the room photo to open a decision challenge.`;
+  document.getElementById('sceneName').textContent = rooms[roomId].name;
+  document.getElementById('sceneSubtitle').textContent = rooms[roomId].subtitle;
+  document.getElementById('sceneImage').src = rooms[roomId].image;
+  document.getElementById('sceneImage').alt = `${rooms[roomId].name} photo with maintenance issues`;
+  renderRoomChips();
+  renderHotspots();
+  updateProgress();
+
+  document.getElementById('scenarioTag').textContent = rooms[roomId].name;
+  document.getElementById('scenarioTitle').textContent = 'Choose a visible issue in the room.';
+  document.getElementById('scenarioQuestion').textContent = 'Each hotspot reveals four possible actions, including one silly answer to keep the demo playful.';
+  document.getElementById('choices').innerHTML = '';
+
+  const feedbackBox = document.getElementById('feedbackBox');
+  feedbackBox.className = 'feedback';
+  feedbackBox.innerHTML = `
+    <div class="feedback-title">Room Ready</div>
+    <div class="feedback-text">Click any pulsing issue in the photo. The learner will need to choose what to do next, not just spot the problem.</div>
   `;
 }
 
-openScenario('leak');
+function openIssue(issueId) {
+  activeIssueId = issueId;
+  const issue = rooms[activeRoomId].issues.find((item) => item.id === issueId);
+  document.getElementById('scenarioTag').textContent = issue.label;
+  document.getElementById('scenarioTitle').textContent = issue.title;
+  document.getElementById('scenarioQuestion').textContent = issue.question;
+
+  const choicesBox = document.getElementById('choices');
+  choicesBox.innerHTML = '';
+  issue.choices.forEach((choice, index) => {
+    const button = document.createElement('button');
+    button.className = 'choice-btn';
+    button.textContent = choice;
+    button.addEventListener('click', () => chooseAnswer(index, button));
+    choicesBox.appendChild(button);
+  });
+
+  const feedbackBox = document.getElementById('feedbackBox');
+  feedbackBox.className = 'feedback';
+  feedbackBox.innerHTML = `
+    <div class="feedback-title">Choose an Action</div>
+    <div class="feedback-text">Which response best protects the home, the person living there, and the situation overall?</div>
+  `;
+}
+
+function chooseAnswer(choiceIndex, clickedButton) {
+  const issue = rooms[activeRoomId].issues.find((item) => item.id === activeIssueId);
+  const allButtons = Array.from(document.querySelectorAll('.choice-btn'));
+  const feedbackBox = document.getElementById('feedbackBox');
+
+  allButtons.forEach((button, index) => {
+    button.disabled = true;
+    if (index === issue.correct) {
+      button.classList.add('correct');
+    }
+  });
+
+  if (choiceIndex !== issue.correct) {
+    clickedButton.classList.add('wrong');
+  } else {
+    solvedByRoom[activeRoomId].add(issue.id);
+    renderHotspots();
+    renderRoomChips();
+    updateProgress();
+  }
+
+  feedbackBox.className = 'feedback ' + (choiceIndex === issue.correct ? 'correct' : 'wrong');
+  feedbackBox.innerHTML = `
+    <div class="feedback-title">${choiceIndex === issue.correct ? 'Correct Decision' : 'Not Quite'}</div>
+    <div class="feedback-text">${issue.feedback}</div>
+  `;
+}
+
+function resetDemo() {
+  roomOrder.forEach((roomId) => {
+    solvedByRoom[roomId].clear();
+  });
+  showFloorplan();
+}
+
+updateProgress();
+showFloorplan();
 </script>
 </body>
 </html>

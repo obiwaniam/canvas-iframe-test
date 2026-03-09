@@ -71,8 +71,7 @@
     display: block;
   }
 
-  .room-card,
-  .panel {
+  .room-card {
     background: var(--card);
     border: 1px solid var(--border);
     border-radius: 22px;
@@ -91,8 +90,7 @@
     margin-bottom: 14px;
   }
 
-  .room-header h2,
-  .panel h2 {
+  .room-header h2 {
     font-size: 24px;
   }
 
@@ -579,63 +577,91 @@
   .map-room {
     position: absolute;
     border: none;
-    background: rgba(15,23,42,0.92);
-    color: #fff;
-    border-radius: 999px;
-    padding: 10px 18px;
+    background: transparent;
+    color: transparent;
+    border-radius: 12px;
+    padding: 0;
     cursor: pointer;
-    transition: transform 0.18s ease, box-shadow 0.18s ease, background 0.18s ease;
-    box-shadow: 0 10px 24px rgba(15,23,42,0.18);
-    font-size: 14px;
-    font-weight: 800;
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    white-space: nowrap;
+    outline: none;
+    transform-origin: center;
+    transition: transform 0.18s ease;
   }
 
-  .map-room:hover {
+  .map-room::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    border: 1px solid rgba(29,78,216,0.04);
+    background: rgba(255,255,255,0.01);
+    box-shadow: 0 0 0 0 rgba(96,165,250,0);
+    transition: border-color 0.18s ease, background 0.18s ease, box-shadow 0.18s ease;
+  }
+
+  .map-room:hover,
+  .map-room:focus-visible {
     transform: scale(1.06);
-    background: #1d4ed8;
-    box-shadow: 0 0 0 6px rgba(147,197,253,0.28), 0 16px 32px rgba(29,78,216,0.24);
   }
 
-  .map-room.active {
-    background: #0f172a;
-    box-shadow: 0 0 0 5px rgba(147,197,253,0.22), 0 16px 28px rgba(15,23,42,0.24);
+  .map-room:hover::before,
+  .map-room:focus-visible::before {
+    border-color: rgba(59,130,246,0.45);
+    background: rgba(147,197,253,0.12);
+    box-shadow: 0 0 0 7px rgba(147,197,253,0.24), 0 10px 22px rgba(29,78,216,0.16);
+  }
+
+  .map-room.active::before {
+    border-color: rgba(59,130,246,0.28);
+    background: rgba(147,197,253,0.08);
+    box-shadow: 0 0 0 5px rgba(147,197,253,0.18);
   }
 
   .map-room-check {
+    position: absolute;
+    right: -8px;
+    top: 50%;
+    transform: translateY(-50%);
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    width: 22px;
-    height: 22px;
+    width: 20px;
+    height: 20px;
     border-radius: 50%;
-    background: rgba(255,255,255,0.18);
-    font-size: 13px;
+    background: #16a34a;
+    color: #fff;
+    border: 2px solid #fff;
+    box-shadow: 0 6px 16px rgba(22,163,74,0.34);
+    font-size: 12px;
+    font-weight: 800;
     opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.18s ease, transform 0.18s ease;
   }
 
   .map-room.done .map-room-check {
     opacity: 1;
-    background: #16a34a;
+    transform: translateY(-50%) scale(1);
   }
 
   .map-bathroom {
-    top: 6%;
-    left: 50%;
-    transform: translateX(-50%);
+    top: 13.6%;
+    left: 40.7%;
+    width: 12.6%;
+    height: 6.8%;
   }
 
   .map-kitchen {
-    bottom: 6%;
-    left: 10%;
+    top: 68.4%;
+    left: 17.3%;
+    width: 15.2%;
+    height: 7.1%;
   }
 
   .map-laundry {
-    top: 53%;
-    left: 1%;
+    top: 85.5%;
+    left: 8.3%;
+    width: 14.6%;
+    height: 7%;
   }
 
   .room-toolbar {
@@ -671,19 +697,7 @@
     background: #eff6ff;
   }
 
-  .scene-meta {
-    margin-bottom: 12px;
-  }
-
-  .scene-meta h3 {
-    font-size: 30px;
-    margin-bottom: 4px;
-  }
-
-  .scene-meta p {
-    color: var(--muted);
-    font-size: 15px;
-  }
+  .room-card.room-active .room-header { display: none; }
 
   .scene-frame {
     position: relative;
@@ -730,7 +744,7 @@
 
   .issue-card {
     position: absolute;
-    width: 320px;
+    width: 300px;
     max-width: calc(100% - 32px);
     border-radius: 18px;
     background: rgba(255,255,255,0.98);
@@ -781,6 +795,11 @@
     font-size: 14px;
     padding: 10px 12px;
     border-radius: 12px;
+  }
+
+  .issue-card .choice-btn:disabled {
+    opacity: 1;
+    cursor: default;
   }
 
   .issue-feedback {
@@ -1077,10 +1096,10 @@ const rooms = {
       {
         id: 'laundry-lint',
         label: 'Lint buildup',
-        left: 93,
+        left: 78,
         top: 84,
-        cardLeft: 55,
-        cardTop: 52,
+        cardLeft: 49,
+        cardTop: 50,
         title: 'Lint is collecting around the dryer vent area.',
         question: 'What should happen next?',
         correct: 0,
@@ -1095,10 +1114,10 @@ const rooms = {
       {
         id: 'laundry-puddle',
         label: 'Water on floor',
-        left: 63,
-        top: 90,
-        cardLeft: 33,
-        cardTop: 54,
+        left: 26,
+        top: 84,
+        cardLeft: 17,
+        cardTop: 50,
         title: 'Water is visible on the floor near the machines.',
         question: 'What is the best first action?',
         correct: 2,
@@ -1113,10 +1132,10 @@ const rooms = {
       {
         id: 'laundry-hose',
         label: 'Washer hose concern',
-        left: 57,
-        top: 41,
-        cardLeft: 33,
-        cardTop: 24,
+        left: 18,
+        top: 18,
+        cardLeft: 8,
+        cardTop: 9,
         title: 'The washer connection area may be leaking or stressed.',
         question: 'What should a learner do next?',
         correct: 2,
@@ -1131,9 +1150,9 @@ const rooms = {
       {
         id: 'laundry-outlet',
         label: 'Outlet load',
-        left: 62,
-        top: 15,
-        cardLeft: 34,
+        left: 71,
+        top: 12,
+        cardLeft: 48,
         cardTop: 8,
         title: 'The outlet area is crowded with plugs.',
         question: 'What is the safest response?',
@@ -1149,10 +1168,10 @@ const rooms = {
       {
         id: 'laundry-pests',
         label: 'Droppings near utility sink',
-        left: 20,
-        top: 79,
-        cardLeft: 18,
-        cardTop: 46,
+        left: 90,
+        top: 88,
+        cardLeft: 57,
+        cardTop: 52,
         title: 'Possible pest droppings are visible near the utility sink.',
         question: 'What should a renter or homeowner do next?',
         correct: 1,

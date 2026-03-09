@@ -68,10 +68,7 @@
   }
 
   .layout {
-    display: grid;
-    grid-template-columns: 1.45fr 0.95fr;
-    gap: 18px;
-    align-items: start;
+    display: block;
   }
 
   .room-card,
@@ -103,6 +100,7 @@
     color: var(--muted);
     font-size: 14px;
   }
+  .small-note:empty { display: none; }
 
   .score-pill {
     background: #eff6ff;
@@ -554,12 +552,7 @@
   .screen { display: none; }
   .screen.active { display: block; }
 
-  .floorplan-shell {
-    display: grid;
-    grid-template-columns: 1.15fr 0.85fr;
-    gap: 16px;
-    align-items: stretch;
-  }
+  .floorplan-shell { display: block; }
 
   .house-map {
     position: relative;
@@ -585,95 +578,69 @@
 
   .map-room {
     position: absolute;
-    border: 3px solid rgba(29,78,216,0.38);
-    background: rgba(255,255,255,0.16);
-    border-radius: 12px;
-    cursor: pointer;
-    transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease, background 0.18s ease;
-    backdrop-filter: blur(2px);
-  }
-
-  .map-room:hover {
-    transform: scale(1.03);
-    border-color: var(--primary);
-    background: rgba(255,255,255,0.28);
-    box-shadow: 0 12px 28px rgba(29,78,216,0.18);
-  }
-
-  .map-room.active {
-    border-color: var(--success);
-    background: rgba(220,252,231,0.22);
-    box-shadow: 0 12px 28px rgba(21,128,61,0.18);
-  }
-
-  .map-room-tag {
-    position: absolute;
-    left: 50%;
-    bottom: -18px;
-    transform: translateX(-50%);
-    background: rgba(17,24,39,0.94);
+    border: none;
+    background: rgba(15,23,42,0.92);
     color: #fff;
-    padding: 8px 12px;
     border-radius: 999px;
+    padding: 10px 18px;
+    cursor: pointer;
+    transition: transform 0.18s ease, box-shadow 0.18s ease, background 0.18s ease;
+    box-shadow: 0 10px 24px rgba(15,23,42,0.18);
     font-size: 14px;
-    font-weight: 700;
+    font-weight: 800;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
     white-space: nowrap;
   }
 
+  .map-room:hover {
+    transform: scale(1.06);
+    background: #1d4ed8;
+    box-shadow: 0 0 0 6px rgba(147,197,253,0.28), 0 16px 32px rgba(29,78,216,0.24);
+  }
+
+  .map-room.active {
+    background: #0f172a;
+    box-shadow: 0 0 0 5px rgba(147,197,253,0.22), 0 16px 28px rgba(15,23,42,0.24);
+  }
+
+  .map-room-check {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.18);
+    font-size: 13px;
+    opacity: 0;
+  }
+
+  .map-room.done .map-room-check {
+    opacity: 1;
+    background: #16a34a;
+  }
+
   .map-bathroom {
-    top: 9%;
-    left: 43%;
-    width: 13%;
-    height: 11%;
+    top: 6%;
+    left: 50%;
+    transform: translateX(-50%);
   }
 
   .map-kitchen {
-    top: 63%;
-    left: 17%;
-    width: 17%;
-    height: 20%;
+    bottom: 6%;
+    left: 10%;
   }
 
   .map-laundry {
-    top: 50%;
-    left: 6%;
-    width: 26%;
-    height: 16%;
-  }
-
-  .room-side-notes {
-    display: grid;
-    gap: 12px;
-  }
-
-  .note-card {
-    border: 1px solid var(--border);
-    border-radius: 18px;
-    background: #f8fbff;
-    padding: 16px;
-  }
-
-  .note-card h3 {
-    font-size: 18px;
-    margin-bottom: 8px;
-  }
-
-  .note-card p,
-  .note-card li {
-    color: var(--muted);
-    font-size: 14px;
-    line-height: 1.45;
-  }
-
-  .note-card ul {
-    margin: 10px 0 0 18px;
-    display: grid;
-    gap: 8px;
+    top: 53%;
+    left: 1%;
   }
 
   .room-toolbar {
     display: flex;
-    justify-content: space-between;
+    justify-content: flex-end;
     align-items: center;
     gap: 12px;
     margin-bottom: 14px;
@@ -742,19 +709,13 @@
 
   .room-hotspot {
     position: absolute;
-    width: 28px;
-    height: 28px;
+    width: 16px;
+    height: 16px;
     border-radius: 50%;
-    border: 3px solid rgba(255,255,255,0.95);
+    border: 2px solid rgba(255,255,255,0.95);
     background: radial-gradient(circle, rgba(239,68,68,0.95) 0, rgba(220,38,38,0.82) 58%, rgba(127,29,29,0.12) 100%);
     box-shadow: 0 0 0 0 rgba(239,68,68,0.45);
     animation: pulse 1.8s infinite;
-    color: #fff;
-    font-size: 14px;
-    font-weight: 800;
-    display: flex;
-    align-items: center;
-    justify-content: center;
     cursor: pointer;
     transform: translate(-50%, -50%);
     transition: transform 0.15s ease;
@@ -840,70 +801,42 @@
     margin-top: 4px;
   }
 
-  .panel-stat-grid {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 10px;
-    margin-bottom: 16px;
-  }
-
-  .panel-stat {
-    border: 1px solid var(--border);
-    border-radius: 16px;
-    background: #f8fbff;
-    padding: 12px;
-  }
-
-  .panel-stat .label {
-    font-size: 12px;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    color: var(--muted);
-    margin-bottom: 4px;
-  }
-
-  .panel-stat .value {
-    font-size: 24px;
-    font-weight: 800;
-    color: var(--primary);
-  }
-
-  .room-summary-list {
-    display: grid;
-    gap: 8px;
-    margin-bottom: 14px;
-  }
-
-  .room-summary-item {
-    border: 1px solid var(--border);
-    border-radius: 14px;
-    background: #fff;
-    padding: 10px 12px;
-    display: flex;
-    justify-content: space-between;
+  .room-complete-banner {
+    position: absolute;
+    left: 50%;
+    bottom: 18px;
+    transform: translateX(-50%);
+    z-index: 12;
+    display: none;
     align-items: center;
-    gap: 12px;
+    gap: 10px;
+    background: rgba(15,23,42,0.94);
+    color: #fff;
+    border-radius: 999px;
+    padding: 10px 16px;
+    box-shadow: 0 18px 36px rgba(15,23,42,0.28);
     font-size: 14px;
-  }
-
-  .room-summary-item strong { color: var(--text); }
-
-  .room-summary-item span {
-    color: var(--primary);
     font-weight: 700;
   }
 
-  @media (max-width: 1020px) {
-    .floorplan-shell {
-      grid-template-columns: 1fr;
-    }
+  .room-complete-banner.show { display: inline-flex; }
 
+  .return-link-btn {
+    border: none;
+    background: #dbeafe;
+    color: var(--primary);
+    border-radius: 999px;
+    padding: 8px 12px;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+  }
+
+  .panel { display: none; }
+
+  @media (max-width: 1020px) {
     .house-map {
       min-height: 520px;
-    }
-
-    .map-room h3 {
-      font-size: 24px;
     }
   }
 </style>
@@ -925,8 +858,8 @@
     <div class="room-card stage-card">
       <div class="room-header">
         <div>
-          <h2 id="stageTitle">Choose a Room</h2>
-          <div class="small-note" id="stageNote">Start on the floorplan, then open a room photo to investigate visible issues.</div>
+          <h2 id="stageTitle">Select a room to inspect</h2>
+          <div class="small-note" id="stageNote"></div>
         </div>
         <div class="score-pill" id="roomProgressPill">Room progress: --</div>
       </div>
@@ -937,44 +870,23 @@
             <img class="floorplan-image" src="assets/floorplan-reference.png" alt="Apartment floorplan">
 
             <button class="map-room map-bathroom" id="map-bathroom" onclick="openRoom('bathroom')" aria-label="Open Bathroom">
-              <span class="map-room-tag">Bath • <span id="map-progress-bathroom">0/4</span></span>
+              <span>Bath</span><span class="map-room-check" id="map-check-bathroom">✓</span>
             </button>
 
             <button class="map-room map-kitchen" id="map-kitchen" onclick="openRoom('kitchen')" aria-label="Open Kitchen">
-              <span class="map-room-tag">Kitchen • <span id="map-progress-kitchen">0/4</span></span>
+              <span>Kitchen</span><span class="map-room-check" id="map-check-kitchen">✓</span>
             </button>
 
             <button class="map-room map-laundry" id="map-laundry" onclick="openRoom('laundry')" aria-label="Open Laundry">
-              <span class="map-room-tag">Laundry • <span id="map-progress-laundry">0/4</span></span>
+              <span>Laundry</span><span class="map-room-check" id="map-check-laundry">✓</span>
             </button>
-          </div>
-
-          <div class="room-side-notes">
-            <div class="note-card">
-              <h3>Why this format lands well</h3>
-              <p>The floorplan makes the experience feel like a guided simulation, while the photo rooms create a stronger first impression than abstract graphics.</p>
-            </div>
-            <div class="note-card">
-              <h3>What the learner does</h3>
-              <ul>
-                <li>Choose a room from the floorplan.</li>
-                <li>Click a visible problem area.</li>
-                <li>Decide the best next action.</li>
-                <li>See instant practical feedback.</li>
-              </ul>
-            </div>
-            <div class="note-card">
-              <h3>Presentation note</h3>
-              <p>Every issue includes one silly answer so the interaction feels playful without losing the practical learning goal.</p>
-            </div>
           </div>
         </div>
       </div>
 
       <div class="screen" id="roomScreen">
         <div class="room-toolbar">
-          <div class="room-chip-row" id="roomChipRow"></div>
-          <button class="tool-btn tool-ghost" onclick="showFloorplan()">Back to Floorplan</button>
+          <button class="tool-btn tool-ghost" onclick="showFloorplan()">Return to Floorplan</button>
         </div>
 
         <div class="scene-wrap">
@@ -986,58 +898,11 @@
             <img class="scene-image" id="sceneImage" src="" alt="Selected room scene">
             <div class="scene-hotspots" id="hotspotLayer"></div>
             <div class="issue-card" id="issueCard"></div>
+            <div class="room-complete-banner" id="roomCompleteBanner">
+              <span>Room complete</span>
+              <button class="return-link-btn" onclick="showFloorplan()">Return to floorplan</button>
+            </div>
           </div>
-        </div>
-      </div>
-    </div>
-
-    <div class="panel">
-      <h2>What Should You Do?</h2>
-      <p class="panel-intro" id="panelIntro">
-        Start with the floorplan. The experience is meant to feel like a realistic walkthrough rather than a conventional quiz.
-      </p>
-
-      <div class="panel-stat-grid">
-        <div class="panel-stat">
-          <div class="label">Current Room</div>
-          <div class="value" id="currentRoomValue">Floorplan</div>
-        </div>
-        <div class="panel-stat">
-          <div class="label">Room Solved</div>
-          <div class="value" id="currentRoomSolvedValue">0/4</div>
-        </div>
-      </div>
-
-      <div class="room-summary-list" id="roomSummaryList"></div>
-
-      <div class="scenario-tag" id="scenarioTag">Choose a room</div>
-      <div class="scenario-title" id="scenarioTitle">Open Bathroom, Kitchen, or Laundry.</div>
-      <div class="scenario-question" id="scenarioQuestion">
-        After you enter a room, click a pulsing issue in the photo to reveal the decision choices.
-      </div>
-
-      <div class="choices" id="choices"></div>
-
-      <div class="feedback" id="feedbackBox">
-        <div class="feedback-title">Demo Ready</div>
-        <div class="feedback-text">
-          For the presentation, you only need one room and one decision to make the interaction feel lively and practical on a big screen.
-        </div>
-      </div>
-
-      <div class="footer-tools">
-        <button class="tool-btn tool-primary" onclick="openRoom('bathroom')">Open Bathroom First</button>
-        <button class="tool-btn tool-ghost" onclick="resetDemo()">Reset Demo</button>
-      </div>
-
-      <div class="legend">
-        <div class="legend-item">
-          <strong>Why this works</strong>
-          The learner has to identify the issue and choose the right response, which makes the activity feel applied instead of passive.
-        </div>
-        <div class="legend-item">
-          <strong>Playful touch</strong>
-          Each question includes one silly answer to keep the experience light and memorable.
         </div>
       </div>
     </div>
@@ -1054,10 +919,10 @@ const rooms = {
       {
         id: 'bathroom-leak',
         label: 'Leak under sink',
-        left: 31,
+        left: 20,
         top: 83,
-        cardLeft: 20,
-        cardTop: 62,
+        cardLeft: 22,
+        cardTop: 54,
         title: 'Water is collecting under the sink cabinet.',
         question: 'What is the best next step?',
         correct: 0,
@@ -1072,10 +937,10 @@ const rooms = {
       {
         id: 'bathroom-stain',
         label: 'Ceiling stain',
-        left: 82,
-        top: 7,
-        cardLeft: 55,
-        cardTop: 10,
+        left: 81,
+        top: 5,
+        cardLeft: 50,
+        cardTop: 8,
         title: 'A stain is spreading on the ceiling.',
         question: 'What should a learner do first?',
         correct: 0,
@@ -1091,9 +956,9 @@ const rooms = {
         id: 'bathroom-mold',
         label: 'Mold near tub',
         left: 88,
-        top: 79,
-        cardLeft: 55,
-        cardTop: 58,
+        top: 83,
+        cardLeft: 49,
+        cardTop: 50,
         title: 'Dark buildup is collecting around the tub edge.',
         question: 'What is the smartest next action?',
         correct: 0,
@@ -1109,9 +974,9 @@ const rooms = {
         id: 'bathroom-outlet',
         label: 'Unsafe outlet',
         left: 58,
-        top: 35,
-        cardLeft: 60,
-        cardTop: 25,
+        top: 36,
+        cardLeft: 50,
+        cardTop: 18,
         title: 'An outlet near the sink looks damaged.',
         question: 'What should happen next?',
         correct: 2,
@@ -1134,9 +999,9 @@ const rooms = {
         id: 'kitchen-leak',
         label: 'Under-sink leak',
         left: 37,
-        top: 71,
-        cardLeft: 15,
-        cardTop: 55,
+        top: 79,
+        cardLeft: 14,
+        cardTop: 48,
         title: 'Water damage is visible inside the sink cabinet.',
         question: 'What is the best next move?',
         correct: 1,
@@ -1151,10 +1016,10 @@ const rooms = {
       {
         id: 'kitchen-grease',
         label: 'Grease buildup',
-        left: 80,
+        left: 78,
         top: 22,
-        cardLeft: 53,
-        cardTop: 11,
+        cardLeft: 49,
+        cardTop: 10,
         title: 'Grease is collecting around the hood and backsplash.',
         question: 'What should a learner do next?',
         correct: 0,
@@ -1169,10 +1034,10 @@ const rooms = {
       {
         id: 'kitchen-outlet',
         label: 'Overloaded outlet',
-        left: 83,
-        top: 49,
-        cardLeft: 54,
-        cardTop: 38,
+        left: 81,
+        top: 50,
+        cardLeft: 49,
+        cardTop: 34,
         title: 'Too many cords are crowded into one outlet area.',
         question: 'What is the safer response?',
         correct: 1,
@@ -1187,10 +1052,10 @@ const rooms = {
       {
         id: 'kitchen-alarm',
         label: 'Smoke alarm attention',
-        left: 53,
-        top: 7,
-        cardLeft: 41,
-        cardTop: 12,
+        left: 52,
+        top: 4,
+        cardLeft: 33,
+        cardTop: 8,
         title: 'The smoke alarm needs attention.',
         question: 'What is the best next step?',
         correct: 1,
@@ -1213,9 +1078,9 @@ const rooms = {
         id: 'laundry-lint',
         label: 'Lint buildup',
         left: 93,
-        top: 80,
-        cardLeft: 59,
-        cardTop: 58,
+        top: 84,
+        cardLeft: 55,
+        cardTop: 52,
         title: 'Lint is collecting around the dryer vent area.',
         question: 'What should happen next?',
         correct: 0,
@@ -1230,10 +1095,10 @@ const rooms = {
       {
         id: 'laundry-puddle',
         label: 'Water on floor',
-        left: 64,
-        top: 85,
-        cardLeft: 38,
-        cardTop: 60,
+        left: 63,
+        top: 90,
+        cardLeft: 33,
+        cardTop: 54,
         title: 'Water is visible on the floor near the machines.',
         question: 'What is the best first action?',
         correct: 2,
@@ -1248,10 +1113,10 @@ const rooms = {
       {
         id: 'laundry-hose',
         label: 'Washer hose concern',
-        left: 60,
-        top: 40,
-        cardLeft: 36,
-        cardTop: 26,
+        left: 57,
+        top: 41,
+        cardLeft: 33,
+        cardTop: 24,
         title: 'The washer connection area may be leaking or stressed.',
         question: 'What should a learner do next?',
         correct: 2,
@@ -1266,10 +1131,10 @@ const rooms = {
       {
         id: 'laundry-outlet',
         label: 'Outlet load',
-        left: 63,
-        top: 18,
-        cardLeft: 39,
-        cardTop: 9,
+        left: 62,
+        top: 15,
+        cardLeft: 34,
+        cardTop: 8,
         title: 'The outlet area is crowded with plugs.',
         question: 'What is the safest response?',
         correct: 1,
@@ -1279,6 +1144,24 @@ const rooms = {
           'Reduce the number of plugged-in devices and avoid overloading it.',
           'Keep all devices connected, but spread them more neatly around the outlet.',
           'Train the outlet for endurance so it can achieve its dreams.'
+        ]
+      },
+      {
+        id: 'laundry-pests',
+        label: 'Droppings near utility sink',
+        left: 20,
+        top: 79,
+        cardLeft: 18,
+        cardTop: 46,
+        title: 'Possible pest droppings are visible near the utility sink.',
+        question: 'What should a renter or homeowner do next?',
+        correct: 1,
+        feedback: 'Pest droppings should be documented and reported or addressed promptly, with cleanup handled safely after the problem is managed.',
+        choices: [
+          'Sweep them aside for now and wait to see whether more appear next month.',
+          'Document the evidence and report or address a possible pest issue promptly.',
+          'Leave them there because they might be decorative mystery beans.',
+          'Set out a tiny welcome basket to make the pests feel seen.'
         ]
       }
     ]
@@ -1308,34 +1191,15 @@ function updateProgress() {
   document.getElementById('totalIssues').textContent = roomOrder.reduce((sum, roomId) => sum + issueCount(roomId), 0).toString();
 
   roomOrder.forEach((roomId) => {
-    const progress = `${solvedByRoom[roomId].size}/${issueCount(roomId)} solved`;
-    const el = document.getElementById(`map-progress-${roomId}`);
-    if (el) el.textContent = progress;
-
     const mapButton = document.getElementById(`map-${roomId}`);
     if (mapButton) {
       mapButton.classList.toggle('active', activeRoomId === roomId);
+      mapButton.classList.toggle('done', solvedByRoom[roomId].size === issueCount(roomId));
     }
   });
-
-  const summary = document.getElementById('roomSummaryList');
-  summary.innerHTML = '';
-  roomOrder.forEach((roomId) => {
-    const item = document.createElement('div');
-    item.className = 'room-summary-item';
-    item.innerHTML = `<strong>${rooms[roomId].name}</strong><span>${solvedByRoom[roomId].size}/${issueCount(roomId)}</span>`;
-    summary.appendChild(item);
-  });
-
-  if (activeRoomId) {
-    document.getElementById('currentRoomValue').textContent = rooms[activeRoomId].name;
-    document.getElementById('currentRoomSolvedValue').textContent = `${solvedByRoom[activeRoomId].size}/${issueCount(activeRoomId)}`;
-    document.getElementById('roomProgressPill').textContent = `Room progress: ${solvedByRoom[activeRoomId].size}/${issueCount(activeRoomId)}`;
-  } else {
-    document.getElementById('currentRoomValue').textContent = 'Floorplan';
-    document.getElementById('currentRoomSolvedValue').textContent = '--';
-    document.getElementById('roomProgressPill').textContent = 'Room progress: --';
-  }
+  document.getElementById('roomProgressPill').textContent = activeRoomId
+    ? `Room progress: ${solvedByRoom[activeRoomId].size}/${issueCount(activeRoomId)}`
+    : 'Room progress: --';
 }
 
 function showFloorplan() {
@@ -1343,32 +1207,11 @@ function showFloorplan() {
   activeIssueId = null;
   document.getElementById('floorplanScreen').classList.add('active');
   document.getElementById('roomScreen').classList.remove('active');
-  document.getElementById('stageTitle').textContent = 'Choose a Room';
-  document.getElementById('stageNote').textContent = 'Start on the floorplan, then open a room photo to investigate visible issues.';
-  document.getElementById('panelIntro').textContent = 'Start with the floorplan. The experience is meant to feel like a realistic walkthrough rather than a conventional quiz.';
-  document.getElementById('scenarioTag').textContent = 'Choose a room';
-  document.getElementById('scenarioTitle').textContent = 'Open Bathroom, Kitchen, or Laundry.';
-  document.getElementById('scenarioQuestion').textContent = 'After you enter a room, click a pulsing issue in the photo to reveal the decision choices.';
-  document.getElementById('choices').innerHTML = '';
-  const feedbackBox = document.getElementById('feedbackBox');
-  feedbackBox.className = 'feedback';
-  feedbackBox.innerHTML = `
-    <div class="feedback-title">Demo Ready</div>
-    <div class="feedback-text">For the presentation, you only need one room and one decision to make the interaction feel lively and practical on a big screen.</div>
-  `;
+  document.getElementById('stageTitle').textContent = 'Select a room to inspect';
+  document.getElementById('stageNote').textContent = '';
+  hideRoomCompleteBanner();
+  closeIssueCard();
   updateProgress();
-}
-
-function renderRoomChips() {
-  const chipRow = document.getElementById('roomChipRow');
-  chipRow.innerHTML = '';
-  roomOrder.forEach((roomId) => {
-    const chip = document.createElement('button');
-    chip.className = 'room-chip' + (roomId === activeRoomId ? ' active' : '');
-    chip.textContent = `${rooms[roomId].name} (${solvedByRoom[roomId].size}/${issueCount(roomId)})`;
-    chip.addEventListener('click', () => openRoom(roomId));
-    chipRow.appendChild(chip);
-  });
 }
 
 function renderHotspots() {
@@ -1394,54 +1237,58 @@ function closeIssueCard() {
   issueCard.innerHTML = '';
 }
 
+function hideRoomCompleteBanner() {
+  const banner = document.getElementById('roomCompleteBanner');
+  banner.classList.remove('show');
+}
+
+function showRoomCompleteBanner() {
+  const banner = document.getElementById('roomCompleteBanner');
+  banner.classList.add('show');
+}
+
+function isRoomComplete(roomId) {
+  return solvedByRoom[roomId].size === issueCount(roomId);
+}
+
 function openRoom(roomId) {
   activeRoomId = roomId;
   activeIssueId = null;
   document.getElementById('floorplanScreen').classList.remove('active');
   document.getElementById('roomScreen').classList.add('active');
   document.getElementById('stageTitle').textContent = `${rooms[roomId].name} Scene`;
-  document.getElementById('stageNote').textContent = 'Click a hotspot in the photo, then decide the best next action.';
-  document.getElementById('panelIntro').textContent = `You are now in the ${rooms[roomId].name.toLowerCase()}. Click a visible issue in the room photo to open a decision challenge.`;
+  document.getElementById('stageNote').textContent = '';
   document.getElementById('sceneName').textContent = rooms[roomId].name;
   document.getElementById('sceneSubtitle').textContent = rooms[roomId].subtitle;
   document.getElementById('sceneImage').src = rooms[roomId].image;
   document.getElementById('sceneImage').alt = `${rooms[roomId].name} photo with maintenance issues`;
-  renderRoomChips();
   renderHotspots();
   closeIssueCard();
+  hideRoomCompleteBanner();
   updateProgress();
+  if (isRoomComplete(roomId)) showRoomCompleteBanner();
+}
 
-  document.getElementById('scenarioTag').textContent = rooms[roomId].name;
-  document.getElementById('scenarioTitle').textContent = 'Choose a visible issue in the room.';
-  document.getElementById('scenarioQuestion').textContent = 'The issue card will appear directly on the image near the problem area.';
-  document.getElementById('choices').innerHTML = '';
-
-  const feedbackBox = document.getElementById('feedbackBox');
-  feedbackBox.className = 'feedback';
-  feedbackBox.innerHTML = `
-    <div class="feedback-title">Room Ready</div>
-    <div class="feedback-text">Click any pulsing issue in the photo. The learner will need to choose what to do next, not just spot the problem.</div>
-  `;
+function placeIssueCard(issueCard, issue) {
+  const frame = document.querySelector('.scene-frame');
+  const frameWidth = frame.clientWidth;
+  const frameHeight = frame.clientHeight;
+  const desiredLeft = (issue.cardLeft / 100) * frameWidth;
+  const desiredTop = (issue.cardTop / 100) * frameHeight;
+  const cardWidth = issueCard.offsetWidth;
+  const cardHeight = issueCard.offsetHeight;
+  const clampedLeft = Math.max(16, Math.min(desiredLeft, frameWidth - cardWidth - 16));
+  const clampedTop = Math.max(16, Math.min(desiredTop, frameHeight - cardHeight - 16));
+  issueCard.style.left = `${clampedLeft}px`;
+  issueCard.style.top = `${clampedTop}px`;
 }
 
 function openIssue(issueId) {
   activeIssueId = issueId;
   const issue = getActiveIssue();
-  document.getElementById('scenarioTag').textContent = issue.label;
-  document.getElementById('scenarioTitle').textContent = issue.title;
-  document.getElementById('scenarioQuestion').textContent = issue.question;
-  document.getElementById('choices').innerHTML = '';
-
-  const feedbackBox = document.getElementById('feedbackBox');
-  feedbackBox.className = 'feedback';
-  feedbackBox.innerHTML = `
-    <div class="feedback-title">Issue Selected</div>
-    <div class="feedback-text">The action choices are now shown directly beside the problem area in the photo.</div>
-  `;
+  hideRoomCompleteBanner();
 
   const issueCard = document.getElementById('issueCard');
-  issueCard.style.left = `${issue.cardLeft}%`;
-  issueCard.style.top = `${issue.cardTop}%`;
   issueCard.innerHTML = `
     <div class="issue-card-head">
       <div>
@@ -1463,38 +1310,34 @@ function openIssue(issueId) {
     issueChoices.appendChild(button);
   });
   issueCard.classList.add('show');
+  placeIssueCard(issueCard, issue);
 }
 
 function chooseAnswer(choiceIndex, clickedButton) {
   const issue = getActiveIssue();
   const allButtons = Array.from(document.querySelectorAll('#issueChoices .choice-btn'));
-  const feedbackBox = document.getElementById('feedbackBox');
   const issueFeedback = document.getElementById('issueFeedback');
 
-  allButtons.forEach((button, index) => {
-    button.disabled = true;
-    if (index === issue.correct) {
-      button.classList.add('correct');
-    }
-  });
-
   if (choiceIndex !== issue.correct) {
+    clickedButton.disabled = true;
     clickedButton.classList.add('wrong');
+    issueFeedback.className = 'issue-feedback show wrong';
+    issueFeedback.textContent = 'Not quite. Try another answer.';
   } else {
+    allButtons.forEach((button) => {
+      button.disabled = true;
+    });
+    clickedButton.classList.add('correct');
     solvedByRoom[activeRoomId].add(issue.id);
     renderHotspots();
-    renderRoomChips();
     updateProgress();
+    issueFeedback.className = 'issue-feedback show correct';
+    issueFeedback.textContent = issue.feedback;
+    if (isRoomComplete(activeRoomId)) {
+      closeIssueCard();
+      showRoomCompleteBanner();
+    }
   }
-
-  issueFeedback.className = 'issue-feedback show ' + (choiceIndex === issue.correct ? 'correct' : 'wrong');
-  issueFeedback.textContent = issue.feedback;
-
-  feedbackBox.className = 'feedback ' + (choiceIndex === issue.correct ? 'correct' : 'wrong');
-  feedbackBox.innerHTML = `
-    <div class="feedback-title">${choiceIndex === issue.correct ? 'Correct Decision' : 'Not Quite'}</div>
-    <div class="feedback-text">${issue.feedback}</div>
-  `;
 }
 
 function resetDemo() {

@@ -565,86 +565,80 @@
     position: relative;
     min-height: 600px;
     border-radius: 18px;
-    background: linear-gradient(180deg, #f8fbff 0%, #eef6ff 100%);
+    background: #f8fbff;
     border: 1px solid var(--border);
     padding: 18px;
     overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
 
-  .house-outline {
-    position: absolute;
-    inset: 22px;
-    border-radius: 22px;
-    border: 3px solid #bfdbfe;
-    background: rgba(255,255,255,0.8);
+  .floorplan-image {
+    width: 100%;
+    max-width: 820px;
+    display: block;
+    border-radius: 14px;
+    box-shadow: 0 12px 28px rgba(15,23,42,0.08);
+    background: #fff;
   }
 
   .map-room {
     position: absolute;
-    border: 2px solid #bfdbfe;
-    background: linear-gradient(180deg, #ffffff, #eff6ff);
-    border-radius: 20px;
-    padding: 18px;
-    text-align: left;
+    border: 3px solid rgba(29,78,216,0.38);
+    background: rgba(255,255,255,0.16);
+    border-radius: 12px;
     cursor: pointer;
-    transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
-    box-shadow: 0 10px 24px rgba(59,130,246,0.08);
+    transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease, background 0.18s ease;
+    backdrop-filter: blur(2px);
   }
 
   .map-room:hover {
-    transform: translateY(-2px);
-    border-color: var(--primary-light);
-    box-shadow: 0 14px 30px rgba(59,130,246,0.14);
+    transform: scale(1.03);
+    border-color: var(--primary);
+    background: rgba(255,255,255,0.28);
+    box-shadow: 0 12px 28px rgba(29,78,216,0.18);
   }
 
   .map-room.active {
-    border-color: var(--primary);
-    box-shadow: 0 16px 32px rgba(29,78,216,0.18);
+    border-color: var(--success);
+    background: rgba(220,252,231,0.22);
+    box-shadow: 0 12px 28px rgba(21,128,61,0.18);
   }
 
-  .map-room h3 {
-    font-size: 28px;
-    margin-bottom: 6px;
-  }
-
-  .map-room p {
-    font-size: 14px;
-    color: var(--muted);
-    margin-bottom: 12px;
-    line-height: 1.35;
-  }
-
-  .map-room .meta {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    font-size: 13px;
-    font-weight: 700;
-    color: var(--primary);
-    background: #eff6ff;
+  .map-room-tag {
+    position: absolute;
+    left: 50%;
+    bottom: -18px;
+    transform: translateX(-50%);
+    background: rgba(17,24,39,0.94);
+    color: #fff;
+    padding: 8px 12px;
     border-radius: 999px;
-    padding: 7px 10px;
+    font-size: 14px;
+    font-weight: 700;
+    white-space: nowrap;
   }
 
   .map-bathroom {
-    top: 62px;
-    left: 54px;
-    width: 40%;
-    height: 210px;
+    top: 9%;
+    left: 43%;
+    width: 13%;
+    height: 11%;
   }
 
   .map-kitchen {
-    top: 62px;
-    right: 54px;
-    width: 43%;
-    height: 250px;
+    top: 63%;
+    left: 17%;
+    width: 17%;
+    height: 20%;
   }
 
   .map-laundry {
-    left: 54px;
-    right: 54px;
-    bottom: 52px;
-    height: 210px;
+    top: 50%;
+    left: 6%;
+    width: 26%;
+    height: 16%;
   }
 
   .room-side-notes {
@@ -748,15 +742,15 @@
 
   .room-hotspot {
     position: absolute;
-    width: 44px;
-    height: 44px;
+    width: 28px;
+    height: 28px;
     border-radius: 50%;
-    border: 3px solid #fff;
-    background: radial-gradient(circle, rgba(239,68,68,0.95) 0, rgba(220,38,38,0.78) 60%, rgba(127,29,29,0.15) 100%);
+    border: 3px solid rgba(255,255,255,0.95);
+    background: radial-gradient(circle, rgba(239,68,68,0.95) 0, rgba(220,38,38,0.82) 58%, rgba(127,29,29,0.12) 100%);
     box-shadow: 0 0 0 0 rgba(239,68,68,0.45);
     animation: pulse 1.8s infinite;
     color: #fff;
-    font-size: 20px;
+    font-size: 14px;
     font-weight: 800;
     display: flex;
     align-items: center;
@@ -773,18 +767,77 @@
     animation: none;
   }
 
-  .room-hotspot-label {
+  .issue-card {
     position: absolute;
-    top: 54px;
-    left: 50%;
-    transform: translateX(-50%);
-    background: rgba(17,24,39,0.88);
-    color: #fff;
-    padding: 6px 9px;
+    width: 320px;
+    max-width: calc(100% - 32px);
+    border-radius: 18px;
+    background: rgba(255,255,255,0.98);
+    border: 1px solid var(--border);
+    box-shadow: 0 22px 46px rgba(15,23,42,0.2);
+    padding: 14px;
+    z-index: 10;
+    display: none;
+  }
+
+  .issue-card.show { display: block; }
+
+  .issue-card-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: start;
+    gap: 10px;
+    margin-bottom: 10px;
+  }
+
+  .issue-card-title {
+    font-size: 18px;
+    font-weight: 800;
+    line-height: 1.2;
+  }
+
+  .issue-card-question {
+    font-size: 14px;
+    color: var(--muted);
+    line-height: 1.4;
+    margin-bottom: 12px;
+  }
+
+  .issue-close {
+    border: none;
+    background: #eff6ff;
+    color: var(--primary);
+    width: 30px;
+    height: 30px;
     border-radius: 999px;
-    font-size: 12px;
-    white-space: nowrap;
-    pointer-events: none;
+    font-size: 18px;
+    font-weight: 700;
+    cursor: pointer;
+    flex: none;
+  }
+
+  .issue-card .choice-btn {
+    font-size: 14px;
+    padding: 10px 12px;
+    border-radius: 12px;
+  }
+
+  .issue-feedback {
+    margin-top: 10px;
+    font-size: 14px;
+    line-height: 1.4;
+    color: var(--text);
+    display: none;
+  }
+
+  .issue-feedback.show { display: block; }
+  .issue-feedback.correct { color: var(--success); font-weight: 700; }
+  .issue-feedback.wrong { color: var(--accent); font-weight: 700; }
+
+  .issue-hint {
+    font-size: 13px;
+    color: var(--muted);
+    margin-top: 4px;
   }
 
   .panel-stat-grid {
@@ -881,24 +934,18 @@
       <div class="screen active" id="floorplanScreen">
         <div class="floorplan-shell">
           <div class="house-map">
-            <div class="house-outline"></div>
+            <img class="floorplan-image" src="assets/floorplan-reference.png" alt="Apartment floorplan">
 
-            <button class="map-room map-bathroom" id="map-bathroom" onclick="openRoom('bathroom')">
-              <h3>Bathroom</h3>
-              <p>Water, mold, and electrical safety issues in a wet space.</p>
-              <div class="meta"><span>Open room</span> <span id="map-progress-bathroom">0/4 solved</span></div>
+            <button class="map-room map-bathroom" id="map-bathroom" onclick="openRoom('bathroom')" aria-label="Open Bathroom">
+              <span class="map-room-tag">Bath • <span id="map-progress-bathroom">0/4</span></span>
             </button>
 
-            <button class="map-room map-kitchen" id="map-kitchen" onclick="openRoom('kitchen')">
-              <h3>Kitchen</h3>
-              <p>Leaks, grease, power safety, and appliance-area decisions.</p>
-              <div class="meta"><span>Open room</span> <span id="map-progress-kitchen">0/4 solved</span></div>
+            <button class="map-room map-kitchen" id="map-kitchen" onclick="openRoom('kitchen')" aria-label="Open Kitchen">
+              <span class="map-room-tag">Kitchen • <span id="map-progress-kitchen">0/4</span></span>
             </button>
 
-            <button class="map-room map-laundry" id="map-laundry" onclick="openRoom('laundry')">
-              <h3>Laundry</h3>
-              <p>Lint, hoses, puddles, and utility-room hazards that need quick judgment.</p>
-              <div class="meta"><span>Open room</span> <span id="map-progress-laundry">0/4 solved</span></div>
+            <button class="map-room map-laundry" id="map-laundry" onclick="openRoom('laundry')" aria-label="Open Laundry">
+              <span class="map-room-tag">Laundry • <span id="map-progress-laundry">0/4</span></span>
             </button>
           </div>
 
@@ -938,6 +985,7 @@
           <div class="scene-frame">
             <img class="scene-image" id="sceneImage" src="" alt="Selected room scene">
             <div class="scene-hotspots" id="hotspotLayer"></div>
+            <div class="issue-card" id="issueCard"></div>
           </div>
         </div>
       </div>
@@ -1006,8 +1054,10 @@ const rooms = {
       {
         id: 'bathroom-leak',
         label: 'Leak under sink',
-        left: 78,
-        top: 84,
+        left: 31,
+        top: 83,
+        cardLeft: 20,
+        cardTop: 62,
         title: 'Water is collecting under the sink cabinet.',
         question: 'What is the best next step?',
         correct: 0,
@@ -1022,8 +1072,10 @@ const rooms = {
       {
         id: 'bathroom-stain',
         label: 'Ceiling stain',
-        left: 60,
-        top: 10,
+        left: 82,
+        top: 7,
+        cardLeft: 55,
+        cardTop: 10,
         title: 'A stain is spreading on the ceiling.',
         question: 'What should a learner do first?',
         correct: 0,
@@ -1038,8 +1090,10 @@ const rooms = {
       {
         id: 'bathroom-mold',
         label: 'Mold near tub',
-        left: 17,
-        top: 92,
+        left: 88,
+        top: 79,
+        cardLeft: 55,
+        cardTop: 58,
         title: 'Dark buildup is collecting around the tub edge.',
         question: 'What is the smartest next action?',
         correct: 0,
@@ -1054,8 +1108,10 @@ const rooms = {
       {
         id: 'bathroom-outlet',
         label: 'Unsafe outlet',
-        left: 92,
-        top: 38,
+        left: 58,
+        top: 35,
+        cardLeft: 60,
+        cardTop: 25,
         title: 'An outlet near the sink looks damaged.',
         question: 'What should happen next?',
         correct: 2,
@@ -1077,8 +1133,10 @@ const rooms = {
       {
         id: 'kitchen-leak',
         label: 'Under-sink leak',
-        left: 36,
-        top: 69,
+        left: 37,
+        top: 71,
+        cardLeft: 15,
+        cardTop: 55,
         title: 'Water damage is visible inside the sink cabinet.',
         question: 'What is the best next move?',
         correct: 1,
@@ -1093,8 +1151,10 @@ const rooms = {
       {
         id: 'kitchen-grease',
         label: 'Grease buildup',
-        left: 77,
-        top: 24,
+        left: 80,
+        top: 22,
+        cardLeft: 53,
+        cardTop: 11,
         title: 'Grease is collecting around the hood and backsplash.',
         question: 'What should a learner do next?',
         correct: 0,
@@ -1109,8 +1169,10 @@ const rooms = {
       {
         id: 'kitchen-outlet',
         label: 'Overloaded outlet',
-        left: 88,
+        left: 83,
         top: 49,
+        cardLeft: 54,
+        cardTop: 38,
         title: 'Too many cords are crowded into one outlet area.',
         question: 'What is the safer response?',
         correct: 1,
@@ -1125,8 +1187,10 @@ const rooms = {
       {
         id: 'kitchen-alarm',
         label: 'Smoke alarm attention',
-        left: 61,
-        top: 8,
+        left: 53,
+        top: 7,
+        cardLeft: 41,
+        cardTop: 12,
         title: 'The smoke alarm needs attention.',
         question: 'What is the best next step?',
         correct: 1,
@@ -1148,8 +1212,10 @@ const rooms = {
       {
         id: 'laundry-lint',
         label: 'Lint buildup',
-        left: 92,
+        left: 93,
         top: 80,
+        cardLeft: 59,
+        cardTop: 58,
         title: 'Lint is collecting around the dryer vent area.',
         question: 'What should happen next?',
         correct: 0,
@@ -1164,8 +1230,10 @@ const rooms = {
       {
         id: 'laundry-puddle',
         label: 'Water on floor',
-        left: 67,
-        top: 86,
+        left: 64,
+        top: 85,
+        cardLeft: 38,
+        cardTop: 60,
         title: 'Water is visible on the floor near the machines.',
         question: 'What is the best first action?',
         correct: 2,
@@ -1180,8 +1248,10 @@ const rooms = {
       {
         id: 'laundry-hose',
         label: 'Washer hose concern',
-        left: 63,
-        top: 48,
+        left: 60,
+        top: 40,
+        cardLeft: 36,
+        cardTop: 26,
         title: 'The washer connection area may be leaking or stressed.',
         question: 'What should a learner do next?',
         correct: 2,
@@ -1196,8 +1266,10 @@ const rooms = {
       {
         id: 'laundry-outlet',
         label: 'Outlet load',
-        left: 68,
-        top: 26,
+        left: 63,
+        top: 18,
+        cardLeft: 39,
+        cardTop: 9,
         title: 'The outlet area is crowded with plugs.',
         question: 'What is the safest response?',
         correct: 1,
@@ -1217,6 +1289,11 @@ const roomOrder = ['bathroom', 'kitchen', 'laundry'];
 const solvedByRoom = Object.fromEntries(roomOrder.map((roomId) => [roomId, new Set()]));
 let activeRoomId = null;
 let activeIssueId = null;
+
+function getActiveIssue() {
+  if (!activeRoomId || !activeIssueId) return null;
+  return rooms[activeRoomId].issues.find((item) => item.id === activeIssueId) || null;
+}
 
 function totalSolvedCount() {
   return roomOrder.reduce((sum, roomId) => sum + solvedByRoom[roomId].size, 0);
@@ -1303,10 +1380,18 @@ function renderHotspots() {
     button.className = 'room-hotspot' + (solvedByRoom[activeRoomId].has(issue.id) ? ' solved' : '');
     button.style.left = `${issue.left}%`;
     button.style.top = `${issue.top}%`;
-    button.innerHTML = `${solvedByRoom[activeRoomId].has(issue.id) ? '✓' : '!'}<span class="room-hotspot-label">${issue.label}</span>`;
+    button.setAttribute('aria-label', issue.label);
+    button.innerHTML = solvedByRoom[activeRoomId].has(issue.id) ? '✓' : '';
     button.addEventListener('click', () => openIssue(issue.id));
     layer.appendChild(button);
   });
+}
+
+function closeIssueCard() {
+  activeIssueId = null;
+  const issueCard = document.getElementById('issueCard');
+  issueCard.classList.remove('show');
+  issueCard.innerHTML = '';
 }
 
 function openRoom(roomId) {
@@ -1323,11 +1408,12 @@ function openRoom(roomId) {
   document.getElementById('sceneImage').alt = `${rooms[roomId].name} photo with maintenance issues`;
   renderRoomChips();
   renderHotspots();
+  closeIssueCard();
   updateProgress();
 
   document.getElementById('scenarioTag').textContent = rooms[roomId].name;
   document.getElementById('scenarioTitle').textContent = 'Choose a visible issue in the room.';
-  document.getElementById('scenarioQuestion').textContent = 'Each hotspot reveals four possible actions, including one silly answer to keep the demo playful.';
+  document.getElementById('scenarioQuestion').textContent = 'The issue card will appear directly on the image near the problem area.';
   document.getElementById('choices').innerHTML = '';
 
   const feedbackBox = document.getElementById('feedbackBox');
@@ -1340,33 +1426,50 @@ function openRoom(roomId) {
 
 function openIssue(issueId) {
   activeIssueId = issueId;
-  const issue = rooms[activeRoomId].issues.find((item) => item.id === issueId);
+  const issue = getActiveIssue();
   document.getElementById('scenarioTag').textContent = issue.label;
   document.getElementById('scenarioTitle').textContent = issue.title;
   document.getElementById('scenarioQuestion').textContent = issue.question;
+  document.getElementById('choices').innerHTML = '';
 
-  const choicesBox = document.getElementById('choices');
-  choicesBox.innerHTML = '';
+  const feedbackBox = document.getElementById('feedbackBox');
+  feedbackBox.className = 'feedback';
+  feedbackBox.innerHTML = `
+    <div class="feedback-title">Issue Selected</div>
+    <div class="feedback-text">The action choices are now shown directly beside the problem area in the photo.</div>
+  `;
+
+  const issueCard = document.getElementById('issueCard');
+  issueCard.style.left = `${issue.cardLeft}%`;
+  issueCard.style.top = `${issue.cardTop}%`;
+  issueCard.innerHTML = `
+    <div class="issue-card-head">
+      <div>
+        <div class="issue-card-title">${issue.title}</div>
+        <div class="issue-hint">Choose the best next action.</div>
+      </div>
+      <button class="issue-close" aria-label="Close issue" onclick="closeIssueCard()">×</button>
+    </div>
+    <div class="issue-card-question">${issue.question}</div>
+    <div class="choices" id="issueChoices"></div>
+    <div class="issue-feedback" id="issueFeedback"></div>
+  `;
+  const issueChoices = document.getElementById('issueChoices');
   issue.choices.forEach((choice, index) => {
     const button = document.createElement('button');
     button.className = 'choice-btn';
     button.textContent = choice;
     button.addEventListener('click', () => chooseAnswer(index, button));
-    choicesBox.appendChild(button);
+    issueChoices.appendChild(button);
   });
-
-  const feedbackBox = document.getElementById('feedbackBox');
-  feedbackBox.className = 'feedback';
-  feedbackBox.innerHTML = `
-    <div class="feedback-title">Choose an Action</div>
-    <div class="feedback-text">Which response best protects the home, the person living there, and the situation overall?</div>
-  `;
+  issueCard.classList.add('show');
 }
 
 function chooseAnswer(choiceIndex, clickedButton) {
-  const issue = rooms[activeRoomId].issues.find((item) => item.id === activeIssueId);
-  const allButtons = Array.from(document.querySelectorAll('.choice-btn'));
+  const issue = getActiveIssue();
+  const allButtons = Array.from(document.querySelectorAll('#issueChoices .choice-btn'));
   const feedbackBox = document.getElementById('feedbackBox');
+  const issueFeedback = document.getElementById('issueFeedback');
 
   allButtons.forEach((button, index) => {
     button.disabled = true;
@@ -1384,6 +1487,9 @@ function chooseAnswer(choiceIndex, clickedButton) {
     updateProgress();
   }
 
+  issueFeedback.className = 'issue-feedback show ' + (choiceIndex === issue.correct ? 'correct' : 'wrong');
+  issueFeedback.textContent = issue.feedback;
+
   feedbackBox.className = 'feedback ' + (choiceIndex === issue.correct ? 'correct' : 'wrong');
   feedbackBox.innerHTML = `
     <div class="feedback-title">${choiceIndex === issue.correct ? 'Correct Decision' : 'Not Quite'}</div>
@@ -1395,6 +1501,7 @@ function resetDemo() {
   roomOrder.forEach((roomId) => {
     solvedByRoom[roomId].clear();
   });
+  closeIssueCard();
   showFloorplan();
 }
 

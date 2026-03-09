@@ -1,0 +1,772 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Home Maintenance Challenge Demo</title>
+<style>
+  :root {
+    --bg: #eef4fb;
+    --card: #ffffff;
+    --text: #1f2937;
+    --muted: #6b7280;
+    --primary: #1d4ed8;
+    --primary-light: #93c5fd;
+    --accent: #ef4444;
+    --success: #15803d;
+    --success-bg: #dcfce7;
+    --warning: #f59e0b;
+    --warning-bg: #fef3c7;
+    --border: #dbe4f0;
+    --shadow: 0 12px 36px rgba(29, 78, 216, 0.12);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: Arial, Helvetica, sans-serif;
+    background:
+      radial-gradient(circle at top left, rgba(147,197,253,0.35), transparent 32%),
+      linear-gradient(180deg, #f8fbff 0%, var(--bg) 100%);
+    color: var(--text);
+    min-height: 100vh;
+  }
+
+  .app {
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 24px;
+  }
+
+  .hero {
+    text-align: center;
+    margin-bottom: 18px;
+  }
+
+  .tag {
+    display: inline-block;
+    background: var(--primary);
+    color: #fff;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 1.6px;
+    text-transform: uppercase;
+    padding: 6px 14px;
+    border-radius: 999px;
+    margin-bottom: 10px;
+  }
+
+  h1 {
+    font-size: clamp(34px, 5vw, 56px);
+    line-height: 1.05;
+    margin-bottom: 8px;
+  }
+
+  .hero p {
+    color: var(--muted);
+    font-size: clamp(16px, 2vw, 20px);
+  }
+
+  .layout {
+    display: grid;
+    grid-template-columns: 1.45fr 0.95fr;
+    gap: 18px;
+    align-items: start;
+  }
+
+  .room-card,
+  .panel {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 22px;
+    box-shadow: var(--shadow);
+  }
+
+  .room-card {
+    padding: 18px;
+  }
+
+  .room-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 14px;
+  }
+
+  .room-header h2,
+  .panel h2 {
+    font-size: 24px;
+  }
+
+  .small-note {
+    color: var(--muted);
+    font-size: 14px;
+  }
+
+  .score-pill {
+    background: #eff6ff;
+    color: var(--primary);
+    border: 1px solid #bfdbfe;
+    padding: 8px 12px;
+    border-radius: 999px;
+    font-size: 14px;
+    font-weight: 700;
+    white-space: nowrap;
+  }
+
+  .room {
+    position: relative;
+    min-height: 640px;
+    border-radius: 18px;
+    overflow: hidden;
+    background:
+      linear-gradient(180deg, #cfe9ff 0 34%, #f1f5f9 34% 100%);
+    border: 1px solid var(--border);
+  }
+
+  .wall-line {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 34%;
+    height: 4px;
+    background: #cbd5e1;
+  }
+
+  .floor {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 33%;
+    background:
+      repeating-linear-gradient(
+        90deg,
+        #dbeafe 0,
+        #dbeafe 80px,
+        #c7d2fe 80px,
+        #c7d2fe 84px
+      );
+    opacity: 0.85;
+  }
+
+  .mirror {
+    position: absolute;
+    top: 80px;
+    left: 62px;
+    width: 170px;
+    height: 118px;
+    border-radius: 18px;
+    background: linear-gradient(180deg, #dff2ff, #f8fdff);
+    border: 10px solid #94a3b8;
+  }
+
+  .sink {
+    position: absolute;
+    top: 220px;
+    left: 78px;
+    width: 138px;
+    height: 58px;
+    border-radius: 0 0 32px 32px;
+    background: #f8fafc;
+    border: 4px solid #94a3b8;
+  }
+
+  .sink::before {
+    content: "";
+    position: absolute;
+    top: -20px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 46px;
+    height: 18px;
+    border-radius: 10px 10px 0 0;
+    border: 4px solid #64748b;
+    border-bottom: none;
+  }
+
+  .cabinet {
+    position: absolute;
+    top: 280px;
+    left: 76px;
+    width: 142px;
+    height: 126px;
+    border-radius: 12px;
+    background: #d97706;
+    border: 4px solid #92400e;
+  }
+
+  .cabinet::before,
+  .cabinet::after {
+    content: "";
+    position: absolute;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: #f8fafc;
+    top: 56px;
+  }
+
+  .cabinet::before { left: 48px; }
+  .cabinet::after { right: 48px; }
+
+  .toilet {
+    position: absolute;
+    left: 328px;
+    bottom: 120px;
+    width: 146px;
+    height: 154px;
+  }
+
+  .toilet-tank {
+    position: absolute;
+    top: 0;
+    left: 24px;
+    width: 96px;
+    height: 54px;
+    border-radius: 12px;
+    background: #f8fafc;
+    border: 4px solid #94a3b8;
+  }
+
+  .toilet-bowl {
+    position: absolute;
+    top: 52px;
+    left: 4px;
+    width: 132px;
+    height: 80px;
+    border-radius: 50% 50% 42% 42%;
+    background: #f8fafc;
+    border: 4px solid #94a3b8;
+  }
+
+  .toilet-base {
+    position: absolute;
+    bottom: 0;
+    left: 40px;
+    width: 54px;
+    height: 64px;
+    border-radius: 0 0 18px 18px;
+    background: #e2e8f0;
+    border: 4px solid #94a3b8;
+  }
+
+  .tub {
+    position: absolute;
+    right: 52px;
+    bottom: 96px;
+    width: 256px;
+    height: 138px;
+    border-radius: 26px 26px 18px 18px;
+    background: #f8fafc;
+    border: 5px solid #94a3b8;
+  }
+
+  .tub::before {
+    content: "";
+    position: absolute;
+    top: -18px;
+    right: 28px;
+    width: 48px;
+    height: 18px;
+    border-radius: 8px 8px 0 0;
+    background: #64748b;
+  }
+
+  .curtain {
+    position: absolute;
+    right: 50px;
+    top: 66px;
+    width: 260px;
+    height: 180px;
+    background:
+      repeating-linear-gradient(
+        90deg,
+        rgba(255,255,255,0.86) 0,
+        rgba(255,255,255,0.86) 18px,
+        rgba(191,219,254,0.9) 18px,
+        rgba(191,219,254,0.9) 24px
+      );
+    border-radius: 16px 16px 0 0;
+    border: 1px solid rgba(148,163,184,0.5);
+  }
+
+  .ceiling-stain {
+    position: absolute;
+    top: 26px;
+    left: 402px;
+    width: 152px;
+    height: 52px;
+    border-radius: 50%;
+    background: rgba(180, 83, 9, 0.25);
+    filter: blur(1px);
+  }
+
+  .outlet {
+    position: absolute;
+    top: 260px;
+    right: 360px;
+    width: 44px;
+    height: 58px;
+    border-radius: 8px;
+    background: #f8fafc;
+    border: 3px solid #94a3b8;
+  }
+
+  .outlet::before,
+  .outlet::after {
+    content: "";
+    position: absolute;
+    width: 6px;
+    height: 16px;
+    background: #64748b;
+    top: 17px;
+    border-radius: 3px;
+  }
+
+  .outlet::before { left: 11px; }
+  .outlet::after { right: 11px; }
+
+  .hotspot {
+    position: absolute;
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    border: 3px solid #fff;
+    background: radial-gradient(circle, rgba(239,68,68,0.92) 0, rgba(220,38,38,0.78) 55%, rgba(127,29,29,0.2) 100%);
+    box-shadow: 0 0 0 0 rgba(239,68,68,0.45);
+    animation: pulse 1.8s infinite;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    font-size: 20px;
+    font-weight: 700;
+    transition: transform 0.15s ease, opacity 0.2s ease;
+  }
+
+  .hotspot:hover { transform: scale(1.08); }
+  .hotspot.solved {
+    background: radial-gradient(circle, rgba(34,197,94,0.96) 0, rgba(22,163,74,0.86) 60%, rgba(20,83,45,0.25) 100%);
+    animation: none;
+  }
+
+  .hotspot-label {
+    position: absolute;
+    top: 50px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(17,24,39,0.9);
+    color: #fff;
+    padding: 5px 8px;
+    border-radius: 999px;
+    font-size: 11px;
+    white-space: nowrap;
+    pointer-events: none;
+  }
+
+  @keyframes pulse {
+    0% { box-shadow: 0 0 0 0 rgba(239,68,68,0.48); }
+    70% { box-shadow: 0 0 0 18px rgba(239,68,68,0); }
+    100% { box-shadow: 0 0 0 0 rgba(239,68,68,0); }
+  }
+
+  .panel {
+    padding: 20px;
+  }
+
+  .panel-intro {
+    color: var(--muted);
+    font-size: 15px;
+    line-height: 1.45;
+    margin: 8px 0 16px;
+  }
+
+  .scenario-tag {
+    display: inline-block;
+    background: #eff6ff;
+    color: var(--primary);
+    font-size: 12px;
+    font-weight: 700;
+    padding: 6px 10px;
+    border-radius: 999px;
+    margin-bottom: 10px;
+  }
+
+  .scenario-title {
+    font-size: 28px;
+    line-height: 1.1;
+    margin-bottom: 10px;
+  }
+
+  .scenario-question {
+    font-size: 18px;
+    color: var(--text);
+    margin-bottom: 14px;
+    line-height: 1.35;
+  }
+
+  .choices {
+    display: grid;
+    gap: 10px;
+    margin-bottom: 14px;
+  }
+
+  .choice-btn {
+    width: 100%;
+    text-align: left;
+    border: 2px solid var(--border);
+    border-radius: 14px;
+    background: #fff;
+    padding: 14px 14px;
+    font-size: 17px;
+    font-weight: 700;
+    color: var(--text);
+    cursor: pointer;
+    transition: all 0.16s ease;
+  }
+
+  .choice-btn:hover {
+    border-color: var(--primary-light);
+    transform: translateY(-1px);
+  }
+
+  .choice-btn.correct {
+    background: var(--success-bg);
+    border-color: var(--success);
+    color: var(--success);
+  }
+
+  .choice-btn.wrong {
+    background: #fef2f2;
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+
+  .feedback {
+    min-height: 124px;
+    border-radius: 16px;
+    padding: 16px;
+    background: #f8fafc;
+    border: 1px solid var(--border);
+  }
+
+  .feedback-title {
+    font-size: 20px;
+    font-weight: 800;
+    margin-bottom: 8px;
+  }
+
+  .feedback-text {
+    font-size: 16px;
+    line-height: 1.45;
+    color: var(--text);
+  }
+
+  .feedback.correct .feedback-title { color: var(--success); }
+  .feedback.correct { background: var(--success-bg); border-color: #86efac; }
+  .feedback.wrong .feedback-title { color: var(--accent); }
+  .feedback.wrong { background: #fef2f2; border-color: #fca5a5; }
+
+  .footer-tools {
+    margin-top: 16px;
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+
+  .tool-btn {
+    border: none;
+    border-radius: 12px;
+    padding: 12px 14px;
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: transform 0.15s ease;
+  }
+
+  .tool-btn:hover { transform: translateY(-1px); }
+
+  .tool-primary {
+    background: var(--primary);
+    color: #fff;
+  }
+
+  .tool-ghost {
+    background: #eef2ff;
+    color: #4338ca;
+  }
+
+  .legend {
+    margin-top: 14px;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+  }
+
+  .legend-item {
+    border-radius: 14px;
+    background: #f8fafc;
+    border: 1px solid var(--border);
+    padding: 12px;
+    font-size: 14px;
+    color: var(--muted);
+  }
+
+  .legend-item strong {
+    display: block;
+    color: var(--text);
+    margin-bottom: 4px;
+  }
+
+  @media (max-width: 1020px) {
+    .layout {
+      grid-template-columns: 1fr;
+    }
+
+    .room {
+      min-height: 560px;
+    }
+  }
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="hero">
+    <div class="tag">Presentation Demo</div>
+    <h1>Spot It, Then Decide</h1>
+    <p>Basic Home Maintenance for Renters (and New Homeowners)</p>
+  </div>
+
+  <div class="layout">
+    <div class="room-card">
+      <div class="room-header">
+        <div>
+          <h2>Bathroom Safety Scene</h2>
+          <div class="small-note">Click any pulsing problem, then choose the best next step.</div>
+        </div>
+        <div class="score-pill">Solved: <span id="solvedCount">0</span>/4</div>
+      </div>
+
+      <div class="room">
+        <div class="wall-line"></div>
+        <div class="floor"></div>
+        <div class="mirror"></div>
+        <div class="sink"></div>
+        <div class="cabinet"></div>
+        <div class="toilet">
+          <div class="toilet-tank"></div>
+          <div class="toilet-bowl"></div>
+          <div class="toilet-base"></div>
+        </div>
+        <div class="curtain"></div>
+        <div class="tub"></div>
+        <div class="ceiling-stain"></div>
+        <div class="outlet"></div>
+
+        <button class="hotspot" id="hotspot-leak" style="left: 120px; top: 345px;" onclick="openScenario('leak')">
+          !
+          <span class="hotspot-label">Leak under sink</span>
+        </button>
+
+        <button class="hotspot" id="hotspot-stain" style="left: 446px; top: 36px;" onclick="openScenario('stain')">
+          !
+          <span class="hotspot-label">Ceiling stain</span>
+        </button>
+
+        <button class="hotspot" id="hotspot-mold" style="right: 118px; top: 158px;" onclick="openScenario('mold')">
+          !
+          <span class="hotspot-label">Mold by tub</span>
+        </button>
+
+        <button class="hotspot" id="hotspot-outlet" style="right: 346px; top: 270px;" onclick="openScenario('outlet')">
+          !
+          <span class="hotspot-label">Unsafe outlet</span>
+        </button>
+      </div>
+    </div>
+
+    <div class="panel">
+      <h2>What Should You Do?</h2>
+      <p class="panel-intro">
+        This demo is built for fast, visual decision-making. Each hotspot checks whether the learner knows not just what the problem is, but what action comes next.
+      </p>
+
+      <div class="scenario-tag" id="scenarioTag">Pick a hotspot</div>
+      <div class="scenario-title" id="scenarioTitle">Choose a pulsing problem in the room.</div>
+      <div class="scenario-question" id="scenarioQuestion">
+        Once you click a hotspot, action choices will appear here.
+      </div>
+
+      <div class="choices" id="choices"></div>
+
+      <div class="feedback" id="feedbackBox">
+        <div class="feedback-title">Demo Ready</div>
+        <div class="feedback-text">
+          For the presentation, click one hotspot and one answer. That is enough to show an engaging, applied-learning interaction on a big screen.
+        </div>
+      </div>
+
+      <div class="footer-tools">
+        <button class="tool-btn tool-primary" onclick="openScenario('leak')">Start With Leak</button>
+        <button class="tool-btn tool-ghost" onclick="resetDemo()">Reset Demo</button>
+      </div>
+
+      <div class="legend">
+        <div class="legend-item">
+          <strong>Why this works</strong>
+          Big visuals, fast interaction, and clear real-world choices make the learning feel immediate.
+        </div>
+        <div class="legend-item">
+          <strong>Playful touch</strong>
+          Each question includes one silly answer to keep the experience light and memorable.
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const scenarios = {
+  leak: {
+    label: 'Leak Under Sink',
+    title: 'Water is collecting under the bathroom sink.',
+    question: 'What is the best next step for a renter or new homeowner?',
+    correct: 1,
+    feedback: 'Report or address the leak quickly. Even a small drip can damage cabinets, flooring, and walls if ignored.',
+    choices: [
+      'Close the cabinet door and pretend you never saw it.',
+      'Place a bucket under it, document it, and report the leak promptly.',
+      'Pour more water down the drain to see if it gets better.',
+      'Tape a motivational quote to the pipe and hope it repairs itself.'
+    ]
+  },
+  stain: {
+    label: 'Ceiling Water Stain',
+    title: 'There is a brown stain spreading across the ceiling.',
+    question: 'What should the learner do first?',
+    correct: 2,
+    feedback: 'A spreading ceiling stain can signal an active leak above. It should be reported or inspected before the damage spreads.',
+    choices: [
+      'Ignore it unless it starts looking expensive.',
+      'Paint over it immediately and call it solved.',
+      'Document the stain and report or inspect it as a likely moisture problem.',
+      'Hang a poster over it and rename it modern decor.'
+    ]
+  },
+  mold: {
+    label: 'Mold Around Tub',
+    title: 'Dark mold-like spots are appearing near the tub and wall edge.',
+    question: 'What is the smartest next action?',
+    correct: 0,
+    feedback: 'Minor surface buildup can sometimes be cleaned safely, but recurring moisture and ventilation problems should also be reported.',
+    choices: [
+      'Clean the area safely, improve ventilation, and report it if it keeps returning.',
+      'Spray perfume on it so the bathroom smells fresher.',
+      'Seal it in with a bath towel and hope nobody notices.',
+      'Assume all mold is decorative and leave it alone.'
+    ]
+  },
+  outlet: {
+    label: 'Unsafe Bathroom Outlet',
+    title: 'An outlet near water looks damaged and unsafe.',
+    question: 'What should happen next?',
+    correct: 3,
+    feedback: 'Damaged electrical outlets near water are a safety issue. Avoid using them and report them for repair immediately.',
+    choices: [
+      'Test it with wet hands so you can be extra sure.',
+      'Plug in more things to see if the problem is real.',
+      'Cover it with a washcloth and continue your day.',
+      'Stop using it and report it right away because it may be hazardous.'
+    ]
+  }
+};
+
+let currentScenarioId = null;
+const solved = new Set();
+
+function renderChoices(scenarioId) {
+  const scenario = scenarios[scenarioId];
+  const choicesBox = document.getElementById('choices');
+  choicesBox.innerHTML = '';
+
+  scenario.choices.forEach((choice, index) => {
+    const button = document.createElement('button');
+    button.className = 'choice-btn';
+    button.textContent = choice;
+    button.addEventListener('click', () => chooseAnswer(scenarioId, index, button));
+    choicesBox.appendChild(button);
+  });
+}
+
+function openScenario(scenarioId) {
+  currentScenarioId = scenarioId;
+  const scenario = scenarios[scenarioId];
+  document.getElementById('scenarioTag').textContent = scenario.label;
+  document.getElementById('scenarioTitle').textContent = scenario.title;
+  document.getElementById('scenarioQuestion').textContent = scenario.question;
+
+  const feedbackBox = document.getElementById('feedbackBox');
+  feedbackBox.className = 'feedback';
+  feedbackBox.innerHTML = `
+    <div class="feedback-title">Choose an Action</div>
+    <div class="feedback-text">This scene is designed to spark a quick decision. Which action best protects the home and the person living in it?</div>
+  `;
+
+  renderChoices(scenarioId);
+}
+
+function chooseAnswer(scenarioId, choiceIndex, clickedButton) {
+  const scenario = scenarios[scenarioId];
+  const allButtons = Array.from(document.querySelectorAll('.choice-btn'));
+  const feedbackBox = document.getElementById('feedbackBox');
+
+  allButtons.forEach((button, index) => {
+    button.disabled = true;
+    if (index === scenario.correct) {
+      button.classList.add('correct');
+    }
+  });
+
+  if (choiceIndex !== scenario.correct) {
+    clickedButton.classList.add('wrong');
+  } else {
+    solved.add(scenarioId);
+    const hotspot = document.getElementById(`hotspot-${scenarioId}`);
+    if (hotspot) hotspot.classList.add('solved');
+    document.getElementById('solvedCount').textContent = solved.size.toString();
+  }
+
+  feedbackBox.className = 'feedback ' + (choiceIndex === scenario.correct ? 'correct' : 'wrong');
+  feedbackBox.innerHTML = `
+    <div class="feedback-title">${choiceIndex === scenario.correct ? 'Correct Decision' : 'Try Again Later'}</div>
+    <div class="feedback-text">${scenario.feedback}</div>
+  `;
+}
+
+function resetDemo() {
+  solved.clear();
+  document.getElementById('solvedCount').textContent = '0';
+  Object.keys(scenarios).forEach((id) => {
+    const hotspot = document.getElementById(`hotspot-${id}`);
+    if (hotspot) hotspot.classList.remove('solved');
+  });
+  currentScenarioId = null;
+  document.getElementById('scenarioTag').textContent = 'Pick a hotspot';
+  document.getElementById('scenarioTitle').textContent = 'Choose a pulsing problem in the room.';
+  document.getElementById('scenarioQuestion').textContent = 'Once you click a hotspot, action choices will appear here.';
+  document.getElementById('choices').innerHTML = '';
+  const feedbackBox = document.getElementById('feedbackBox');
+  feedbackBox.className = 'feedback';
+  feedbackBox.innerHTML = `
+    <div class="feedback-title">Demo Ready</div>
+    <div class="feedback-text">For the presentation, click one hotspot and one answer. That is enough to show an engaging, applied-learning interaction on a big screen.</div>
+  `;
+}
+
+openScenario('leak');
+</script>
+</body>
+</html>

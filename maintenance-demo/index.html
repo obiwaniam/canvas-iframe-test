@@ -885,7 +885,7 @@
   <div class="hero">
     <div class="tag">Presentation Demo</div>
     <h1>Home Maintenance Challenge</h1>
-    <p>Choose a room, spot visible issues, and decide what a renter or new homeowner should do next.</p>
+    <p>Choose a room, spot visible issues, and decide what a resident or property owner should do next.</p>
   </div>
 
   <div class="presenter-strip">
@@ -956,7 +956,7 @@
             <div class="scene-hotspots" id="hotspotLayer"></div>
             <div class="issue-card" id="issueCard"></div>
             <div class="room-complete-banner" id="roomCompleteBanner">
-              <span>Room complete</span>
+              <span id="roomCompleteText">Room complete</span>
               <button class="return-link-btn" onclick="showFloorplan()">Return to floorplan</button>
             </div>
           </div>
@@ -1256,9 +1256,16 @@ function issueCount(roomId) {
   return rooms[roomId].issues.length;
 }
 
+function completedRoomCount() {
+  return roomOrder.filter((roomId) => solvedByRoom[roomId].size === issueCount(roomId)).length;
+}
+
 function updateProgress() {
-  document.getElementById('solvedCount').textContent = totalSolvedCount().toString();
-  document.getElementById('totalIssues').textContent = roomOrder.reduce((sum, roomId) => sum + issueCount(roomId), 0).toString();
+  const solvedOverall = totalSolvedCount();
+  const totalOverall = roomOrder.reduce((sum, roomId) => sum + issueCount(roomId), 0);
+  const completedRooms = completedRoomCount();
+  document.getElementById('solvedCount').textContent = solvedOverall.toString();
+  document.getElementById('totalIssues').textContent = totalOverall.toString();
 
   roomOrder.forEach((roomId) => {
     const mapButton = document.getElementById(`map-${roomId}`);
@@ -1268,8 +1275,8 @@ function updateProgress() {
     }
   });
   document.getElementById('roomProgressPill').textContent = activeRoomId
-    ? `Room progress: ${solvedByRoom[activeRoomId].size}/${issueCount(activeRoomId)}`
-    : 'Room progress: --';
+    ? `Room progress: ${solvedByRoom[activeRoomId].size}/${issueCount(activeRoomId)} | Completed rooms: ${completedRooms}/${roomOrder.length}`
+    : `Solved overall: ${solvedOverall}/${totalOverall} | Completed rooms: ${completedRooms}/${roomOrder.length}`;
 }
 
 function showFloorplan() {
@@ -1312,8 +1319,14 @@ function hideRoomCompleteBanner() {
   banner.classList.remove('show');
 }
 
-function showRoomCompleteBanner() {
+function showRoomCompleteBanner(roomId = activeRoomId) {
   const banner = document.getElementById('roomCompleteBanner');
+  const bannerText = document.getElementById('roomCompleteText');
+  if (roomId && rooms[roomId]) {
+    bannerText.textContent = `${rooms[roomId].name} complete: ${solvedByRoom[roomId].size}/${issueCount(roomId)} issues solved`;
+  } else {
+    bannerText.textContent = 'Room complete';
+  }
   banner.classList.add('show');
 }
 
@@ -1334,7 +1347,9 @@ function openRoom(roomId) {
   document.getElementById('floorplanScreen').classList.remove('active');
   document.getElementById('roomScreen').classList.add('active');
   document.getElementById('stageTitle').textContent = `${rooms[roomId].name} Scene`;
-  document.getElementById('stageNote').textContent = '';
+  document.getElementById('stageNote').textContent = isRoomComplete(roomId)
+    ? 'All issues in this room have been completed.'
+    : '';
   document.getElementById('sceneName').textContent = rooms[roomId].name;
   document.getElementById('sceneSubtitle').textContent = rooms[roomId].subtitle;
   document.getElementById('sceneImage').src = rooms[roomId].image;
@@ -1343,7 +1358,7 @@ function openRoom(roomId) {
   closeIssueCard();
   hideRoomCompleteBanner();
   updateProgress();
-  if (isRoomComplete(roomId)) showRoomCompleteBanner();
+  if (isRoomComplete(roomId)) showRoomCompleteBanner(roomId);
 }
 
 function placeIssueCard(issueCard, issue) {
@@ -1433,8 +1448,8 @@ function chooseAnswer(choiceIndex, clickedButton) {
     `;
     refreshIssueCardPlacement();
     if (isRoomComplete(activeRoomId)) {
-      closeIssueCard();
-      showRoomCompleteBanner();
+      document.getElementById('stageNote').textContent = 'All issues in this room have been completed.';
+      showRoomCompleteBanner(activeRoomId);
     }
   }
 }

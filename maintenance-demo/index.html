@@ -41,6 +41,7 @@
   .hero {
     text-align: center;
     margin-bottom: 18px;
+    position: relative;
   }
 
   .tag {
@@ -543,6 +544,93 @@
 
   .presenter-strip strong { color: var(--primary); }
 
+  .a11y-toggle-wrap {
+    position: absolute;
+    top: 0;
+    right: 0;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .a11y-label {
+    margin-bottom: 0;
+  }
+
+  .a11y-switch {
+    border: 1px solid #bfdbfe;
+    border-radius: 999px;
+    background: #eff6ff;
+    color: #1e3a8a;
+    padding: 6px 10px;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 12px;
+    font-weight: 800;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    cursor: pointer;
+  }
+
+  .a11y-switch-track {
+    width: 36px;
+    height: 20px;
+    border-radius: 999px;
+    background: #93c5fd;
+    border: 1px solid #60a5fa;
+    position: relative;
+    display: inline-block;
+  }
+
+  .a11y-switch-thumb {
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: #fff;
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    transition: transform 0.16s ease;
+    box-shadow: 0 1px 3px rgba(15, 23, 42, 0.3);
+  }
+
+  .a11y-switch.on {
+    background: #dbeafe;
+    border-color: #93c5fd;
+  }
+
+  .a11y-switch.on .a11y-switch-track {
+    background: #2563eb;
+    border-color: #1d4ed8;
+  }
+
+  .a11y-switch.on .a11y-switch-thumb {
+    transform: translateX(16px);
+  }
+
+  .a11y-switch-text {
+    min-width: 2.6em;
+    text-align: left;
+  }
+
+  .tool-btn:focus-visible,
+  .a11y-switch:focus-visible,
+  .choice-btn:focus-visible,
+  .room-hotspot:focus-visible,
+  .issue-close:focus-visible,
+  .return-link-btn:focus-visible {
+    outline: 3px solid #1d4ed8;
+    outline-offset: 2px;
+  }
+
+  .map-room:focus-visible .map-room-zone {
+    fill: rgba(147,197,253,0.16);
+    stroke: rgba(59,130,246,0.8);
+    filter: drop-shadow(0 0 7px rgba(59,130,246,0.45));
+    transform: scale(1.06);
+  }
+
   .stage-card {
     min-height: 760px;
   }
@@ -860,6 +948,49 @@
 
   .room-complete-banner.show { display: inline-flex; }
 
+  .a11y-issue-list {
+    margin-bottom: 12px;
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    background: #f8fafc;
+    padding: 12px;
+  }
+
+  .a11y-issue-list h4 {
+    font-size: 15px;
+    margin-bottom: 8px;
+  }
+
+  .a11y-issue-list p {
+    font-size: 13px;
+    color: var(--muted);
+    margin-bottom: 10px;
+  }
+
+  .a11y-issue-buttons {
+    display: grid;
+    gap: 8px;
+  }
+
+  .a11y-issue-btn {
+    width: 100%;
+    text-align: left;
+    border: 1px solid #bfdbfe;
+    border-radius: 10px;
+    background: #fff;
+    color: #1f2937;
+    padding: 10px 12px;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+  }
+
+  .a11y-issue-btn.solved {
+    border-color: #86efac;
+    background: #ecfdf5;
+    color: #166534;
+  }
+
   .return-link-btn {
     border: none;
     background: #dbeafe;
@@ -878,11 +1009,30 @@
       min-height: 520px;
     }
   }
+
+  @media (max-width: 860px) {
+    .a11y-toggle-wrap {
+      position: static;
+      justify-content: center;
+      margin-top: 12px;
+      flex-wrap: wrap;
+    }
+  }
 </style>
 </head>
 <body>
 <div class="app">
   <div class="hero">
+    <div class="a11y-toggle-wrap">
+      <span class="tag a11y-label">Screen Reader Support</span>
+      <button class="a11y-switch" id="a11yToggle" type="button" role="switch" aria-checked="false" aria-label="Screen reader support off" aria-describedby="a11yToggleHint">
+        <span class="a11y-switch-track" aria-hidden="true">
+          <span class="a11y-switch-thumb"></span>
+        </span>
+        <span class="a11y-switch-text" id="a11yToggleText">Off</span>
+      </button>
+      <span class="sr-only" id="a11yToggleHint">Turns on screen reader compatibility helpers such as focus management and spoken status updates.</span>
+    </div>
     <div class="tag">Presentation Demo</div>
     <h1>Home Maintenance Challenge</h1>
     <p>Choose a room, spot visible issues, and decide what a resident or property owner should do next.</p>
@@ -951,6 +1101,7 @@
             <h3 id="sceneName">Bathroom</h3>
             <p id="sceneSubtitle">Spot visible maintenance issues, then decide the best next step.</p>
           </div>
+          <div class="a11y-issue-list" id="a11yIssueList" hidden></div>
           <div class="scene-frame">
             <img class="scene-image" id="sceneImage" src="" alt="Selected room scene">
             <div class="scene-hotspots" id="hotspotLayer"></div>
@@ -965,6 +1116,7 @@
     </div>
   </div>
 </div>
+<div class="sr-only" id="srAnnouncements" role="status" aria-live="polite" aria-atomic="true"></div>
 
 <script>
 const rooms = {
@@ -1242,6 +1394,71 @@ const roomOrder = ['bathroom', 'kitchen', 'laundry'];
 const solvedByRoom = Object.fromEntries(roomOrder.map((roomId) => [roomId, new Set()]));
 let activeRoomId = null;
 let activeIssueId = null;
+let lastIssueTrigger = null;
+const A11Y_STORAGE_KEY = 'maintenanceDemoScreenReaderMode';
+let a11yMode = false;
+
+function readA11yModeSetting() {
+  try {
+    return window.localStorage.getItem(A11Y_STORAGE_KEY) === 'true';
+  } catch {
+    return false;
+  }
+}
+
+function saveA11yModeSetting(enabled) {
+  try {
+    window.localStorage.setItem(A11Y_STORAGE_KEY, enabled ? 'true' : 'false');
+  } catch {
+    // Ignore localStorage availability issues.
+  }
+}
+
+function announceStatus(message) {
+  if (!a11yMode || !message) return;
+  const region = document.getElementById('srAnnouncements');
+  if (!region) return;
+  region.textContent = '';
+  window.setTimeout(() => {
+    region.textContent = message;
+  }, 30);
+}
+
+function updateA11yToggleLabel() {
+  const toggle = document.getElementById('a11yToggle');
+  if (!toggle) return;
+  const toggleText = document.getElementById('a11yToggleText');
+  toggle.setAttribute('aria-checked', String(a11yMode));
+  toggle.setAttribute('aria-label', `Screen reader support ${a11yMode ? 'on' : 'off'}`);
+  toggle.classList.toggle('on', a11yMode);
+  if (toggleText) {
+    toggleText.textContent = a11yMode ? 'On' : 'Off';
+  }
+}
+
+function setA11yMode(enabled, announceChange = true) {
+  a11yMode = Boolean(enabled);
+  saveA11yModeSetting(a11yMode);
+  updateA11yToggleLabel();
+  renderA11yIssueList();
+  if (a11yMode && announceChange) {
+    announceStatus('Screen reader support enabled.');
+  }
+}
+
+function initA11yMode() {
+  const toggle = document.getElementById('a11yToggle');
+  if (!toggle) return;
+  setA11yMode(readA11yModeSetting(), false);
+  toggle.addEventListener('click', () => {
+    const nextMode = !a11yMode;
+    setA11yMode(nextMode, true);
+    if (!nextMode) {
+      const region = document.getElementById('srAnnouncements');
+      if (region) region.textContent = '';
+    }
+  });
+}
 
 function getActiveIssue() {
   if (!activeRoomId || !activeIssueId) return null;
@@ -1287,8 +1504,13 @@ function showFloorplan() {
   document.getElementById('stageTitle').textContent = 'Select a room to inspect';
   document.getElementById('stageNote').textContent = '';
   hideRoomCompleteBanner();
-  closeIssueCard();
+  closeIssueCard({ restoreFocus: false });
+  renderA11yIssueList();
   updateProgress();
+  const solvedOverall = totalSolvedCount();
+  const totalOverall = roomOrder.reduce((sum, roomId) => sum + issueCount(roomId), 0);
+  const completedRooms = completedRoomCount();
+  announceStatus(`Floorplan. ${solvedOverall} of ${totalOverall} issues solved. ${completedRooms} of ${roomOrder.length} rooms complete.`);
 }
 
 function renderHotspots() {
@@ -1296,22 +1518,68 @@ function renderHotspots() {
   layer.innerHTML = '';
   const room = rooms[activeRoomId];
   room.issues.forEach((issue) => {
+    const isSolved = solvedByRoom[activeRoomId].has(issue.id);
     const button = document.createElement('button');
-    button.className = 'room-hotspot' + (solvedByRoom[activeRoomId].has(issue.id) ? ' solved' : '');
+    button.type = 'button';
+    button.className = 'room-hotspot' + (isSolved ? ' solved' : '');
     button.style.left = `${issue.left}%`;
     button.style.top = `${issue.top}%`;
-    button.setAttribute('aria-label', issue.label);
-    button.innerHTML = solvedByRoom[activeRoomId].has(issue.id) ? '✓' : '';
-    button.addEventListener('click', () => openIssue(issue.id));
+    button.setAttribute('aria-label', `${issue.label}${isSolved ? ', solved' : ', not solved'}`);
+    button.innerHTML = isSolved ? '✓' : '';
+    button.addEventListener('click', (event) => openIssue(issue.id, event.currentTarget));
     layer.appendChild(button);
   });
 }
 
-function closeIssueCard() {
+function renderA11yIssueList() {
+  const container = document.getElementById('a11yIssueList');
+  if (!container) return;
+  if (!a11yMode || !activeRoomId || !rooms[activeRoomId]) {
+    container.hidden = true;
+    container.innerHTML = '';
+    return;
+  }
+
+  const room = rooms[activeRoomId];
+  const solvedCount = solvedByRoom[activeRoomId].size;
+  const totalCount = issueCount(activeRoomId);
+  container.hidden = false;
+  container.innerHTML = `
+    <h4>Issue list (screen reader support)</h4>
+    <p>Use these buttons if spatial hotspot positions are hard to follow. Solved: ${solvedCount}/${totalCount}.</p>
+    <div class="a11y-issue-buttons" id="a11yIssueButtons"></div>
+  `;
+  const buttonWrap = document.getElementById('a11yIssueButtons');
+  room.issues.forEach((issue) => {
+    const solved = solvedByRoom[activeRoomId].has(issue.id);
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.className = `a11y-issue-btn${solved ? ' solved' : ''}`;
+    button.textContent = `${issue.label} (${solved ? 'Solved' : 'Not solved'})`;
+    button.setAttribute('aria-label', `${issue.label}. ${solved ? 'Solved.' : 'Not solved.'} Open issue.`);
+    button.addEventListener('click', (event) => openIssue(issue.id, event.currentTarget));
+    buttonWrap.appendChild(button);
+  });
+}
+
+function closeIssueCard(options = {}) {
+  const { restoreFocus = a11yMode, announceClose = false } = options;
   activeIssueId = null;
   const issueCard = document.getElementById('issueCard');
   issueCard.classList.remove('show');
   issueCard.innerHTML = '';
+  issueCard.removeAttribute('role');
+  issueCard.removeAttribute('aria-modal');
+  issueCard.removeAttribute('aria-labelledby');
+  issueCard.removeAttribute('aria-describedby');
+  const target = lastIssueTrigger;
+  lastIssueTrigger = null;
+  if (restoreFocus && target && typeof target.focus === 'function') {
+    target.focus();
+  }
+  if (announceClose) {
+    announceStatus('Issue panel closed.');
+  }
 }
 
 function hideRoomCompleteBanner() {
@@ -1328,6 +1596,9 @@ function showRoomCompleteBanner(roomId = activeRoomId) {
     bannerText.textContent = 'Room complete';
   }
   banner.classList.add('show');
+  if (roomId && rooms[roomId]) {
+    announceStatus(`${rooms[roomId].name} complete. ${solvedByRoom[roomId].size} of ${issueCount(roomId)} issues solved.`);
+  }
 }
 
 function isRoomComplete(roomId) {
@@ -1355,9 +1626,11 @@ function openRoom(roomId) {
   document.getElementById('sceneImage').src = rooms[roomId].image;
   document.getElementById('sceneImage').alt = `${rooms[roomId].name} photo with maintenance issues`;
   renderHotspots();
-  closeIssueCard();
+  renderA11yIssueList();
+  closeIssueCard({ restoreFocus: false });
   hideRoomCompleteBanner();
   updateProgress();
+  announceStatus(`${rooms[roomId].name}. ${solvedByRoom[roomId].size} of ${issueCount(roomId)} issues solved.`);
   if (isRoomComplete(roomId)) showRoomCompleteBanner(roomId);
 }
 
@@ -1391,27 +1664,33 @@ function renderResponsibility(issue) {
   `;
 }
 
-function openIssue(issueId) {
+function openIssue(issueId, triggerElement = null) {
   activeIssueId = issueId;
   const issue = getActiveIssue();
+  lastIssueTrigger = triggerElement || document.activeElement;
   hideRoomCompleteBanner();
 
   const issueCard = document.getElementById('issueCard');
+  issueCard.setAttribute('role', 'dialog');
+  issueCard.setAttribute('aria-modal', a11yMode ? 'true' : 'false');
+  issueCard.setAttribute('aria-labelledby', 'issueCardTitle');
+  issueCard.setAttribute('aria-describedby', 'issueCardQuestion');
   issueCard.innerHTML = `
     <div class="issue-card-head">
       <div>
-        <div class="issue-card-title">${issue.title}</div>
+        <div class="issue-card-title" id="issueCardTitle">${issue.title}</div>
         <div class="issue-hint">Choose the best next action.</div>
       </div>
-      <button class="issue-close" aria-label="Close issue" onclick="closeIssueCard()">×</button>
+      <button class="issue-close" type="button" aria-label="Close issue" onclick="closeIssueCard({ announceClose: true })">×</button>
     </div>
-    <div class="issue-card-question">${issue.question}</div>
+    <div class="issue-card-question" id="issueCardQuestion">${issue.question}</div>
     <div class="choices" id="issueChoices"></div>
     <div class="issue-feedback" id="issueFeedback"></div>
   `;
   const issueChoices = document.getElementById('issueChoices');
   issue.choices.forEach((choice, index) => {
     const button = document.createElement('button');
+    button.type = 'button';
     button.className = 'choice-btn';
     button.textContent = choice;
     button.addEventListener('click', () => chooseAnswer(index, button));
@@ -1419,6 +1698,11 @@ function openIssue(issueId) {
   });
   issueCard.classList.add('show');
   placeIssueCard(issueCard, issue);
+  announceStatus(`Issue: ${issue.label}. ${issue.question}`);
+  if (a11yMode) {
+    const firstChoice = issueChoices.querySelector('.choice-btn');
+    if (firstChoice) firstChoice.focus();
+  }
 }
 
 function chooseAnswer(choiceIndex, clickedButton) {
@@ -1431,6 +1715,7 @@ function chooseAnswer(choiceIndex, clickedButton) {
     clickedButton.classList.add('wrong');
     issueFeedback.className = 'issue-feedback show wrong';
     issueFeedback.textContent = 'Not quite. Try another answer.';
+    announceStatus('Not quite. Try another answer.');
     refreshIssueCardPlacement();
   } else {
     allButtons.forEach((button) => {
@@ -1439,6 +1724,7 @@ function chooseAnswer(choiceIndex, clickedButton) {
     clickedButton.classList.add('correct');
     solvedByRoom[activeRoomId].add(issue.id);
     renderHotspots();
+    renderA11yIssueList();
     updateProgress();
     issueFeedback.className = 'issue-feedback show correct';
     issueFeedback.innerHTML = `
@@ -1446,6 +1732,7 @@ function chooseAnswer(choiceIndex, clickedButton) {
       <span class="issue-feedback-copy">${issue.feedback}</span>
       ${renderResponsibility(issue)}
     `;
+    announceStatus(`Correct. Responsibility: ${issue.responsibility || 'Joint'}.`);
     refreshIssueCardPlacement();
     if (isRoomComplete(activeRoomId)) {
       document.getElementById('stageNote').textContent = 'All issues in this room have been completed.';
@@ -1458,10 +1745,49 @@ function resetDemo() {
   roomOrder.forEach((roomId) => {
     solvedByRoom[roomId].clear();
   });
-  closeIssueCard();
+  closeIssueCard({ restoreFocus: false });
   showFloorplan();
 }
 
+function getFocusableElements(container) {
+  if (!container) return [];
+  const focusableSelector = 'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])';
+  return Array.from(container.querySelectorAll(focusableSelector)).filter((item) => {
+    if (item.hasAttribute('disabled')) return false;
+    if (item.getAttribute('aria-hidden') === 'true') return false;
+    return true;
+  });
+}
+
+document.addEventListener('keydown', (event) => {
+  if (!a11yMode) return;
+  const issueCard = document.getElementById('issueCard');
+  if (!issueCard.classList.contains('show')) return;
+
+  if (event.key === 'Escape') {
+    event.preventDefault();
+    closeIssueCard({ restoreFocus: true, announceClose: true });
+    return;
+  }
+
+  if (event.key !== 'Tab') return;
+  const focusable = getFocusableElements(issueCard);
+  if (focusable.length === 0) return;
+  const first = focusable[0];
+  const last = focusable[focusable.length - 1];
+
+  if (event.shiftKey && document.activeElement === first) {
+    event.preventDefault();
+    last.focus();
+    return;
+  }
+  if (!event.shiftKey && document.activeElement === last) {
+    event.preventDefault();
+    first.focus();
+  }
+});
+
+initA11yMode();
 updateProgress();
 showFloorplan();
 </script>

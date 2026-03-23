@@ -1399,8 +1399,13 @@ const A11Y_STORAGE_KEY = 'maintenanceDemoScreenReaderMode';
 let a11yMode = false;
 
 function readA11yModeSetting() {
-  // Testing mode: always start with screen reader support on.
-  return true;
+  try {
+    const storedValue = window.localStorage.getItem(A11Y_STORAGE_KEY);
+    if (storedValue === null) return false;
+    return storedValue === 'true';
+  } catch {
+    return false;
+  }
 }
 
 function saveA11yModeSetting(enabled) {

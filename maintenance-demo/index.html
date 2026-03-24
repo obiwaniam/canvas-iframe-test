@@ -546,11 +546,13 @@
 
   .a11y-toggle-wrap {
     position: absolute;
-    top: 0;
-    right: 0;
+    top: -10px;
+    left: 0;
     display: flex;
-    align-items: center;
-    gap: 8px;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+    z-index: 2;
   }
 
   .a11y-label {
@@ -1074,7 +1076,7 @@
 
                 <g class="map-room" id="map-kitchen" role="button" tabindex="0" aria-label="Open Kitchen" onclick="openRoom('kitchen')" onkeydown="handleMapRoomKey(event, 'kitchen')">
                   <title>Open Kitchen</title>
-                  <rect class="map-room-zone" x="9.2" y="68.7" width="12.9" height="6.7" rx="1.4"></rect>
+                  <rect class="map-room-zone" x="17.9" y="68.7" width="12.9" height="6.7" rx="1.4"></rect>
                   <g class="map-room-check" id="map-check-kitchen">
                     <circle class="map-room-check-badge" cx="33.5" cy="72" r="2.3"></circle>
                     <text class="map-room-check-text" x="33.5" y="72">✓</text>
@@ -1083,7 +1085,7 @@
 
                 <g class="map-room" id="map-laundry" role="button" tabindex="0" aria-label="Open Laundry" onclick="openRoom('laundry')" onkeydown="handleMapRoomKey(event, 'laundry')">
                   <title>Open Laundry</title>
-                  <rect class="map-room-zone" x="0.1" y="85.7" width="12.5" height="6.8" rx="1.4"></rect>
+                  <rect class="map-room-zone" x="8.8" y="85.7" width="12.5" height="6.8" rx="1.4"></rect>
                   <g class="map-room-check" id="map-check-laundry">
                     <circle class="map-room-check-badge" cx="24" cy="89.1" r="2.3"></circle>
                     <text class="map-room-check-text" x="24" y="89.1">✓</text>

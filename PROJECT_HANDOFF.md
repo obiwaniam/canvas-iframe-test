@@ -131,6 +131,36 @@ Relevant functions:
 - `showRoomCompleteBanner()`
 - `isRoomComplete()`
 
+### Accessibility Mode (Screen Reader Support)
+
+The maintenance demo now includes an optional accessibility mode controlled by a hero-level toggle labeled `Screen Reader Support`.
+
+Current behavior:
+
+- Default for first-time users is `Off`.
+- The selected state is persisted in `localStorage` under `maintenanceDemoScreenReaderMode`.
+- The toggle uses a switch pattern (`role="switch"`, `aria-checked`) and displays `On`/`Off`.
+- The toggle is visually placed in the top-right of the hero area.
+
+When mode is `On`, additional behavior is enabled:
+
+- A live region announces key status updates (`#srAnnouncements`).
+- Opening an issue moves focus to the first answer choice.
+- `Esc` closes the issue card and returns focus to the trigger.
+- `Tab`/`Shift+Tab` are trapped inside the issue card while it is open.
+- A non-visual fallback issue list appears above the scene (`#a11yIssueList`) with issue buttons and solved states.
+
+Relevant functions / elements:
+
+- `readA11yModeSetting()`
+- `setA11yMode()`
+- `updateA11yToggleLabel()`
+- `initA11yMode()`
+- `getFocusableElements()`
+- `#a11yToggle`
+- `#srAnnouncements`
+- `#a11yIssueList`
+
 ## Recently Requested Content/UX Decisions
 
 These are intentional and should not be "cleaned up" unless the user asks:

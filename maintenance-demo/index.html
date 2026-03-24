@@ -550,42 +550,47 @@
     right: 0;
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 8px;
   }
 
   .a11y-label {
     margin-bottom: 0;
+    color: var(--muted);
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
   }
 
   .a11y-switch {
-    border: 1px solid #bfdbfe;
+    border: 1px solid #dbe4f0;
     border-radius: 999px;
-    background: #eff6ff;
-    color: #1e3a8a;
-    padding: 6px 10px;
+    background: #ffffff;
+    color: #475569;
+    padding: 4px 8px;
     display: inline-flex;
     align-items: center;
-    gap: 8px;
-    font-size: 12px;
-    font-weight: 800;
-    letter-spacing: 0.04em;
+    gap: 7px;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.03em;
     text-transform: uppercase;
     cursor: pointer;
   }
 
   .a11y-switch-track {
-    width: 36px;
-    height: 20px;
+    width: 32px;
+    height: 18px;
     border-radius: 999px;
-    background: #93c5fd;
-    border: 1px solid #60a5fa;
+    background: #cbd5e1;
+    border: 1px solid #94a3b8;
     position: relative;
     display: inline-block;
   }
 
   .a11y-switch-thumb {
-    width: 14px;
-    height: 14px;
+    width: 12px;
+    height: 12px;
     border-radius: 50%;
     background: #fff;
     position: absolute;
@@ -596,17 +601,17 @@
   }
 
   .a11y-switch.on {
-    background: #dbeafe;
-    border-color: #93c5fd;
+    background: #f8fafc;
+    border-color: #cbd5e1;
   }
 
   .a11y-switch.on .a11y-switch-track {
-    background: #2563eb;
-    border-color: #1d4ed8;
+    background: #64748b;
+    border-color: #475569;
   }
 
   .a11y-switch.on .a11y-switch-thumb {
-    transform: translateX(16px);
+    transform: translateX(14px);
   }
 
   .a11y-switch-text {
@@ -1024,7 +1029,7 @@
 <div class="app">
   <div class="hero">
     <div class="a11y-toggle-wrap">
-      <span class="tag a11y-label">Screen Reader Support</span>
+      <span class="a11y-label">Screen reader support</span>
       <button class="a11y-switch" id="a11yToggle" type="button" role="switch" aria-checked="false" aria-label="Screen reader support off" aria-describedby="a11yToggleHint">
         <span class="a11y-switch-track" aria-hidden="true">
           <span class="a11y-switch-thumb"></span>
@@ -1033,7 +1038,6 @@
       </button>
       <span class="sr-only" id="a11yToggleHint">Turns on screen reader compatibility helpers such as focus management and spoken status updates.</span>
     </div>
-    <div class="tag">Presentation Demo</div>
     <h1>Home Maintenance Challenge</h1>
     <p>Choose a room, spot visible issues, and decide what a resident or property owner should do next.</p>
   </div>
@@ -1070,7 +1074,7 @@
 
                 <g class="map-room" id="map-kitchen" role="button" tabindex="0" aria-label="Open Kitchen" onclick="openRoom('kitchen')" onkeydown="handleMapRoomKey(event, 'kitchen')">
                   <title>Open Kitchen</title>
-                  <rect class="map-room-zone" x="19.2" y="68.7" width="12.9" height="6.7" rx="1.4"></rect>
+                  <rect class="map-room-zone" x="9.2" y="68.7" width="12.9" height="6.7" rx="1.4"></rect>
                   <g class="map-room-check" id="map-check-kitchen">
                     <circle class="map-room-check-badge" cx="33.5" cy="72" r="2.3"></circle>
                     <text class="map-room-check-text" x="33.5" y="72">✓</text>
@@ -1079,7 +1083,7 @@
 
                 <g class="map-room" id="map-laundry" role="button" tabindex="0" aria-label="Open Laundry" onclick="openRoom('laundry')" onkeydown="handleMapRoomKey(event, 'laundry')">
                   <title>Open Laundry</title>
-                  <rect class="map-room-zone" x="10.1" y="85.7" width="12.5" height="6.8" rx="1.4"></rect>
+                  <rect class="map-room-zone" x="0.1" y="85.7" width="12.5" height="6.8" rx="1.4"></rect>
                   <g class="map-room-check" id="map-check-laundry">
                     <circle class="map-room-check-badge" cx="24" cy="89.1" r="2.3"></circle>
                     <text class="map-room-check-text" x="24" y="89.1">✓</text>

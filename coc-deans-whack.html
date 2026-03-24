@@ -1,0 +1,536 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Whack-A-Dean</title>
+  <style>
+    :root {
+      --bg: #081528;
+      --panel: #0d213d;
+      --panel-2: #17375f;
+      --text: #f8fafc;
+      --muted: #c8d7ea;
+      --accent: #f59e0b;
+      --accent-2: #38bdf8;
+      --danger: #ef4444;
+      --coc-blue: #0b4ea2;
+      --coc-gold: #f4b400;
+      --hole: #4a3a25;
+      --hole-inner: #1f1308;
+      --hammer-cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='96' height='96' viewBox='0 0 96 96'%3E%3Cg transform='rotate(-25 48 48)'%3E%3Crect x='41' y='33' width='14' height='52' rx='6' fill='%23a16207'/%3E%3Crect x='38' y='29' width='20' height='10' rx='4' fill='%238b5cf6'/%3E%3Crect x='23' y='18' width='50' height='18' rx='6' fill='%2394a3b8' stroke='%23475569' stroke-width='3'/%3E%3Crect x='23' y='24' width='50' height='6' rx='3' fill='%23e2e8f0'/%3E%3C/g%3E%3C/svg%3E") 18 12, crosshair;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: "Segoe UI", Tahoma, sans-serif;
+      background:
+        radial-gradient(circle at 20% 0%, #1e3a8a 0%, transparent 40%),
+        radial-gradient(circle at 100% 100%, #92400e 0%, transparent 38%),
+        var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+      padding: 20px;
+    }
+
+    body.game-live {
+      cursor: var(--hammer-cursor);
+    }
+
+    .app {
+      width: min(980px, 100%);
+      background:
+        linear-gradient(180deg, rgba(255,255,255,0.08), rgba(255,255,255,0.03)),
+        linear-gradient(135deg, rgba(11,78,162,0.2), rgba(244,180,0,0.08));
+      border: 2px solid rgba(244, 180, 0, 0.6);
+      border-radius: 18px;
+      padding: 18px;
+      backdrop-filter: blur(6px);
+      box-shadow: 0 0 0 4px rgba(11, 78, 162, 0.55), 0 18px 34px rgba(0, 0, 0, 0.35);
+    }
+
+    .topbar {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 14px;
+    }
+
+    .title {
+      font-size: clamp(1.2rem, 2.6vw, 2rem);
+      font-weight: 800;
+      margin: 0;
+      color: #fff7d6;
+      text-shadow: 0 2px 0 #7a4b00, 0 0 16px rgba(244, 180, 0, 0.4);
+    }
+
+    .subtitle {
+      margin: 4px 0 0;
+      color: var(--muted);
+      font-size: 0.95rem;
+    }
+
+    .hud {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .chip {
+      background: linear-gradient(180deg, #112b4d, #0b1f38);
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      border-radius: 999px;
+      padding: 10px 14px;
+      font-weight: 700;
+      min-width: 110px;
+      text-align: center;
+    }
+
+    .controls {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      margin: 10px 0 16px;
+      flex-wrap: wrap;
+    }
+
+    button {
+      border: 0;
+      border-radius: 12px;
+      padding: 10px 14px;
+      font-weight: 800;
+      cursor: pointer;
+      color: #2f1d00;
+      background: linear-gradient(135deg, var(--coc-gold), #fde68a);
+      box-shadow: 0 4px 0 #8a5b00;
+    }
+
+    button.secondary {
+      color: #e2edff;
+      background: linear-gradient(135deg, var(--coc-blue), #1d4ed8);
+      box-shadow: 0 4px 0 #072a57;
+    }
+
+    button:disabled {
+      filter: grayscale(0.5);
+      opacity: 0.8;
+      cursor: not-allowed;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(130px, 1fr));
+      gap: 16px;
+      user-select: none;
+      justify-items: center;
+    }
+
+    .hole-wrap {
+      width: 190px;
+      display: grid;
+      justify-items: center;
+      gap: 8px;
+    }
+
+    .hole {
+      position: relative;
+      width: 170px;
+      height: 170px;
+      border-radius: 50%;
+      background:
+        radial-gradient(92% 78% at 50% 40%, #5d4630 0%, #352312 65%),
+        radial-gradient(80% 74% at 50% 70%, var(--hole-inner), transparent 72%),
+        linear-gradient(180deg, #6d4f2f, var(--hole));
+      border: 3px solid rgba(255, 255, 255, 0.2);
+      overflow: hidden;
+      cursor: inherit;
+      box-shadow: inset 0 -8px 22px rgba(0, 0, 0, 0.5), 0 8px 14px rgba(0, 0, 0, 0.35);
+    }
+
+    .mole {
+      position: absolute;
+      left: 50%;
+      bottom: -220px;
+      transform: translateX(-50%);
+      transition: bottom 180ms ease-out;
+      text-align: center;
+      width: 100%;
+      pointer-events: none;
+    }
+
+    .mole.up {
+      bottom: 0;
+      pointer-events: auto;
+    }
+
+    .head {
+      width: 170px;
+      height: 170px;
+      border-radius: 50%;
+      border: 0;
+      object-fit: cover;
+      background: #e2e8f0;
+      box-shadow: inset 0 -10px 12px rgba(0, 0, 0, 0.18);
+    }
+
+    .dept-label {
+      min-height: 44px;
+      text-align: center;
+      font-size: 16px;
+      font-weight: 700;
+      line-height: 1.2;
+      max-width: 170px;
+      padding: 4px 6px;
+      border-radius: 8px;
+      background: rgba(6, 16, 31, 0.72);
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      color: var(--muted);
+      opacity: 0;
+      transform: translateY(4px);
+      transition: opacity 140ms ease, transform 140ms ease;
+      pointer-events: none;
+    }
+
+    .dept-label.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .flash {
+      position: absolute;
+      inset: 0;
+      background: rgba(239, 68, 68, 0.25);
+      opacity: 0;
+      transition: opacity 90ms;
+      pointer-events: none;
+    }
+
+    .hole.hit .flash {
+      opacity: 1;
+    }
+
+    .note {
+      margin-top: 14px;
+      color: var(--muted);
+      font-size: 0.9rem;
+      line-height: 1.4;
+      background: rgba(2, 6, 23, 0.5);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 12px;
+      padding: 10px 12px;
+    }
+  </style>
+</head>
+<body>
+  <main class="app">
+    <div class="topbar">
+      <div>
+        <h1 class="title">Whack-A-Dean</h1>
+        <p class="subtitle">COC Arcade Edition</p>
+      </div>
+      <div class="hud">
+        <div class="chip" id="scoreChip">Score: 0</div>
+        <div class="chip" id="bestChip">Best: 0</div>
+        <div class="chip" id="timeChip">Time: 30</div>
+      </div>
+    </div>
+
+    <div class="controls">
+      <button id="startBtn">Start Round</button>
+      <button id="restartBtn" class="secondary" disabled>Restart</button>
+      <button id="soundBtn" class="secondary" type="button">Sound: On</button>
+    </div>
+
+    <section class="grid" id="board" aria-label="Whack-a-mole board"></section>
+
+    <p class="note">
+      Dean-only roster from COC Instruction directory. Each mole label shows the dean's school/department.
+    </p>
+  </main>
+
+  <script>
+    const fallbackDeanImg = "https://ui-avatars.com/api/?name=COC+Dean&background=334155&color=fff&size=256";
+
+    const deans = [
+      {
+        name: "Dianne Avery",
+        department: "Professional Learning",
+        img: "https://www.canyons.edu/_images/administration/instruction/directory/DianneAvery.jpg"
+      },
+      {
+        name: "Nadia Cotti",
+        department: "Health Safety",
+        img: "https://www.canyons.edu/_images/administration/instruction/directory/NadiaCotti.jpg"
+      },
+      {
+        name: "James Glapa-Grossklag",
+        department: "Learning Resources",
+        img: "https://www.canyons.edu/_images/administration/instruction/directory/JamesGlapaGrossklag.jpg"
+      },
+      {
+        name: "Harriet Happel",
+        department: "Career Education",
+        img: "https://www.canyons.edu/_images/administration/instruction/directory/HarrietHappel.jpg"
+      },
+      {
+        name: "Andy McCutcheon",
+        department: "Humanities Arts",
+        img: "https://www.canyons.edu/_images/administration/instruction/directory/faculty-dean-Andy-McCutcheon.jpg"
+      },
+      {
+        name: "Chad Peters",
+        department: "Kinesiology Athletics",
+        img: "https://www.canyons.edu/_images/chadpeters.jpg"
+      },
+      {
+        name: "Deanna Riveira",
+        department: "Social Sciences",
+        img: "https://www.canyons.edu/_images/academics/schools/socialsciences/DeannaRiveira.jpg"
+      },
+      {
+        name: "Monica Shukla-Belmontes",
+        department: "Business Tech",
+        img: "https://www.canyons.edu/_images/administration/instruction/MonicaShukla.jpg"
+      },
+      {
+        name: "Paloma Vargas",
+        department: "Math Engineering",
+        img: "https://www.canyons.edu/_images/administration/instruction/PalomaVargas.jpg"
+      }
+    ];
+
+    const board = document.getElementById("board");
+    const scoreChip = document.getElementById("scoreChip");
+    const bestChip = document.getElementById("bestChip");
+    const timeChip = document.getElementById("timeChip");
+    const startBtn = document.getElementById("startBtn");
+    const restartBtn = document.getElementById("restartBtn");
+    const soundBtn = document.getElementById("soundBtn");
+
+    const holeCount = 9;
+    const roundSeconds = 30;
+    const riseIntervalMs = 1800;
+    const visibleDurationMs = 1500;
+
+    let score = 0;
+    let best = Number(localStorage.getItem("cocDeanWhackBest") || 0);
+    let timeLeft = roundSeconds;
+    let gameRunning = false;
+    let timerId = null;
+    let spawnerId = null;
+    let currentUpIndex = -1;
+    let currentlyWhacked = false;
+    let soundOn = true;
+    let audioCtx = null;
+
+    bestChip.textContent = `Best: ${best}`;
+
+    const holes = Array.from({ length: holeCount }, (_, i) => {
+      const hole = document.createElement("button");
+      hole.className = "hole";
+      hole.type = "button";
+      hole.setAttribute("aria-label", `Hole ${i + 1}`);
+
+      const mole = document.createElement("div");
+      mole.className = "mole";
+
+      const img = document.createElement("img");
+      img.className = "head";
+      img.alt = "Dean head";
+
+      const label = document.createElement("div");
+      label.className = "dept-label";
+
+      const flash = document.createElement("div");
+      flash.className = "flash";
+
+      mole.append(img);
+      const wrap = document.createElement("div");
+      wrap.className = "hole-wrap";
+      hole.append(mole, flash);
+      wrap.append(hole, label);
+      board.append(wrap);
+
+      hole.addEventListener("click", () => {
+        if (!gameRunning) return;
+        if (currentUpIndex !== i || currentlyWhacked) return;
+        currentlyWhacked = true;
+        score += 1;
+        playHitSound();
+        scoreChip.textContent = `Score: ${score}`;
+        hole.classList.add("hit");
+        setTimeout(() => hole.classList.remove("hit"), 100);
+        hideMole(i);
+      });
+
+      return { hole, mole, img, label };
+    });
+
+    function randomDean() {
+      return deans[Math.floor(Math.random() * deans.length)];
+    }
+
+    function randomHoleIndex() {
+      const idx = Math.floor(Math.random() * holeCount);
+      return idx === currentUpIndex ? (idx + 1) % holeCount : idx;
+    }
+
+    function showMole(index) {
+      if (currentUpIndex !== -1) return;
+      const target = holes[index];
+      const dean = randomDean();
+      target.img.onerror = () => {
+        target.img.onerror = null;
+        target.img.src = fallbackDeanImg;
+      };
+      target.img.src = dean.img;
+      target.img.alt = `${dean.name} headshot`;
+      target.label.textContent = dean.department || dean.name;
+      target.label.classList.add("visible");
+      target.mole.classList.add("up");
+      currentUpIndex = index;
+      currentlyWhacked = false;
+
+      setTimeout(() => {
+        if (currentUpIndex === index && !currentlyWhacked) {
+          playMissSound();
+          hideMole(index);
+        }
+      }, visibleDurationMs);
+    }
+
+    function hideMole(index) {
+      holes[index].mole.classList.remove("up");
+      holes[index].label.classList.remove("visible");
+      holes[index].label.textContent = "";
+      if (currentUpIndex === index) currentUpIndex = -1;
+    }
+
+    function ensureAudio() {
+      if (!audioCtx) {
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      }
+      if (audioCtx.state === "suspended") {
+        audioCtx.resume();
+      }
+    }
+
+    function playTone(freq, duration = 0.08, type = "square", volume = 0.04) {
+      if (!soundOn) return;
+      ensureAudio();
+      const now = audioCtx.currentTime;
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.type = type;
+      osc.frequency.setValueAtTime(freq, now);
+      gain.gain.setValueAtTime(volume, now);
+      gain.gain.exponentialRampToValueAtTime(0.0001, now + duration);
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+      osc.start(now);
+      osc.stop(now + duration);
+    }
+
+    function playStartSound() {
+      playTone(440, 0.07, "square", 0.05);
+      setTimeout(() => playTone(660, 0.08, "square", 0.05), 70);
+    }
+
+    function playHitSound() {
+      playTone(220, 0.05, "triangle", 0.06);
+      setTimeout(() => playTone(160, 0.05, "triangle", 0.04), 45);
+    }
+
+    function playMissSound() {
+      playTone(130, 0.08, "sawtooth", 0.03);
+    }
+
+    function playEndSound() {
+      playTone(330, 0.08, "square", 0.05);
+      setTimeout(() => playTone(247, 0.1, "square", 0.05), 80);
+      setTimeout(() => playTone(196, 0.14, "square", 0.05), 180);
+    }
+
+    function clearBoard() {
+      holes.forEach((_, idx) => hideMole(idx));
+      currentUpIndex = -1;
+      currentlyWhacked = false;
+    }
+
+    function tick() {
+      timeLeft -= 1;
+      timeChip.textContent = `Time: ${timeLeft}`;
+      if (timeLeft <= 0) stopGame();
+    }
+
+    function spawnLoop() {
+      if (!gameRunning) return;
+      if (currentUpIndex !== -1) return;
+      const idx = randomHoleIndex();
+      showMole(idx);
+    }
+
+    function startGame() {
+      if (gameRunning) return;
+      gameRunning = true;
+      score = 0;
+      timeLeft = roundSeconds;
+      scoreChip.textContent = "Score: 0";
+      timeChip.textContent = `Time: ${timeLeft}`;
+      startBtn.disabled = true;
+      restartBtn.disabled = false;
+      document.body.classList.add("game-live");
+      playStartSound();
+      clearBoard();
+
+      timerId = setInterval(tick, 1000);
+      spawnerId = setInterval(spawnLoop, riseIntervalMs);
+      spawnLoop();
+    }
+
+    function stopGame() {
+      gameRunning = false;
+      clearInterval(timerId);
+      clearInterval(spawnerId);
+      clearBoard();
+      startBtn.disabled = false;
+      restartBtn.disabled = false;
+      document.body.classList.remove("game-live");
+      playEndSound();
+
+      if (score > best) {
+        best = score;
+        localStorage.setItem("cocDeanWhackBest", String(best));
+        bestChip.textContent = `Best: ${best}`;
+      }
+      timeChip.textContent = "Time: 0";
+      startBtn.textContent = "Play Again";
+    }
+
+    startBtn.addEventListener("click", startGame);
+    restartBtn.addEventListener("click", () => {
+      clearInterval(timerId);
+      clearInterval(spawnerId);
+      gameRunning = false;
+      startBtn.textContent = "Start Round";
+      startGame();
+    });
+
+    soundBtn.addEventListener("click", () => {
+      soundOn = !soundOn;
+      soundBtn.textContent = `Sound: ${soundOn ? "On" : "Off"}`;
+      if (soundOn) {
+        playTone(520, 0.05, "square", 0.04);
+      }
+    });
+  </script>
+</body>
+</html>

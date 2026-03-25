@@ -544,38 +544,6 @@
 
   .presenter-strip strong { color: var(--primary); }
 
-  .canvas-test-bar {
-    border: 1px solid #bfdbfe;
-    background: #eff6ff;
-    color: #1e3a8a;
-    border-radius: 12px;
-    padding: 8px 12px;
-    margin-bottom: 12px;
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
-    align-items: center;
-    font-size: 13px;
-  }
-
-  .canvas-test-bar strong {
-    color: #1d4ed8;
-  }
-
-  .canvas-test-value {
-    color: #0f172a;
-    font-weight: 700;
-  }
-
-  .canvas-test-query {
-    display: block;
-    width: 100%;
-    font-family: Consolas, "Courier New", monospace;
-    font-size: 12px;
-    color: #334155;
-    overflow-wrap: anywhere;
-  }
-
   .a11y-toggle-wrap {
     position: absolute;
     top: -10px;
@@ -1076,15 +1044,6 @@
     <p>Choose a room, spot visible issues, and decide what a resident or property owner should do next.</p>
   </div>
 
-  <div class="canvas-test-bar" id="canvasIdentityBar">
-    <strong>Canvas redirect test:</strong>
-    <span>Canvas User ID: <span class="canvas-test-value" id="canvasUserId">not provided</span></span>
-    <span>Login ID: <span class="canvas-test-value" id="canvasLoginId">not provided</span></span>
-    <span>SIS ID: <span class="canvas-test-value" id="canvasSisId">not provided</span></span>
-    <span class="canvas-test-query">Query: <span class="canvas-test-value" id="canvasQuery">none</span></span>
-    <span class="canvas-test-query">Received URL: <span class="canvas-test-value" id="canvasFullUrl">none</span></span>
-  </div>
-
   <div class="presenter-strip">
     <div><strong>Big-screen flow:</strong> Start on the floorplan, open any room, click one hotspot, and choose one action to show how the learning works.</div>
     <div class="score-pill">Solved overall: <span id="solvedCount">0</span>/<span id="totalIssues">12</span></div>
@@ -1518,24 +1477,41 @@ function decodeQueryValue(value) {
   }
 }
 
-function renderCanvasIdentityTest() {
-  const query = new URLSearchParams(window.location.search);
-  const userId = decodeQueryValue(query.get('canvasUserId')) || decodeQueryValue(query.get('userId')) || 'not provided';
-  const loginId = decodeQueryValue(query.get('loginId')) || decodeQueryValue(query.get('login')) || 'not provided';
-  const sisId = decodeQueryValue(query.get('sisId')) || 'not provided';
-  const rawQuery = window.location.search || 'none';
-  const fullUrl = window.location.href || 'none';
+function parseNameFromLogin(loginId) {
+  if (!loginId || !loginId.includes('@')) return { firstName: null, lastName: null };
+  const localPart = loginId.split('@')[0] || '';
+  const pieces = localPart
+    .split(/[._-]+/)
+    .map((part) => part.trim())
+    .filter(Boolean);
+  const toNameCase = (value) => value ? value.charAt(0).toUpperCase() + value.slice(1).toLowerCase() : null;
+  if (pieces.length === 0) return { firstName: null, lastName: null };
+  return {
+    firstName: toNameCase(pieces[0]),
+    lastName: toNameCase(pieces[1] || null)
+  };
+}
 
-  const userIdEl = document.getElementById('canvasUserId');
-  const loginIdEl = document.getElementById('canvasLoginId');
-  const sisIdEl = document.getElementById('canvasSisId');
-  const queryEl = document.getElementById('canvasQuery');
-  const fullUrlEl = document.getElementById('canvasFullUrl');
-  if (userIdEl) userIdEl.textContent = userId;
-  if (loginIdEl) loginIdEl.textContent = loginId;
-  if (sisIdEl) sisIdEl.textContent = sisId;
-  if (queryEl) queryEl.textContent = rawQuery;
-  if (fullUrlEl) fullUrlEl.textContent = fullUrl;
+function buildStageTitle() {
+  const firstName = document.body.dataset.canvasFirstName;
+  return firstName ? `${firstName} - Select a room to inspect` : 'Select a room to inspect';
+}
+
+function readCanvasIdentity() {
+  const query = new URLSearchParams(window.location.search);
+  const userId = decodeQueryValue(query.get('canvasUserId')) || decodeQueryValue(query.get('userId')) || '';
+  const loginId = decodeQueryValue(query.get('loginId')) || decodeQueryValue(query.get('login')) || '';
+  const sisId = decodeQueryValue(query.get('sisId')) || '';
+  const firstName = decodeQueryValue(query.get('firstName')) || decodeQueryValue(query.get('givenName')) || decodeQueryValue(query.get('personGivenName')) || '';
+  const lastName = decodeQueryValue(query.get('lastName')) || decodeQueryValue(query.get('familyName')) || decodeQueryValue(query.get('personFamilyName')) || '';
+
+  const parsedFromLogin = parseNameFromLogin(loginId);
+
+  document.body.dataset.canvasUserId = userId;
+  document.body.dataset.canvasLoginId = loginId;
+  document.body.dataset.canvasSisId = sisId;
+  document.body.dataset.canvasFirstName = firstName || parsedFromLogin.firstName || '';
+  document.body.dataset.canvasLastName = lastName || parsedFromLogin.lastName || '';
 }
 
 function getActiveIssue() {
@@ -1579,7 +1555,7 @@ function showFloorplan() {
   activeIssueId = null;
   document.getElementById('floorplanScreen').classList.add('active');
   document.getElementById('roomScreen').classList.remove('active');
-  document.getElementById('stageTitle').textContent = 'Select a room to inspect';
+  document.getElementById('stageTitle').textContent = buildStageTitle();
   document.getElementById('stageNote').textContent = '';
   hideRoomCompleteBanner();
   closeIssueCard({ restoreFocus: false });
@@ -1866,7 +1842,7 @@ document.addEventListener('keydown', (event) => {
 });
 
 initA11yMode();
-renderCanvasIdentityTest();
+readCanvasIdentity();
 updateProgress();
 showFloorplan();
 </script>

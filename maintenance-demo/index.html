@@ -1082,6 +1082,7 @@
     <span>Login ID: <span class="canvas-test-value" id="canvasLoginId">not provided</span></span>
     <span>SIS ID: <span class="canvas-test-value" id="canvasSisId">not provided</span></span>
     <span class="canvas-test-query">Query: <span class="canvas-test-value" id="canvasQuery">none</span></span>
+    <span class="canvas-test-query">Received URL: <span class="canvas-test-value" id="canvasFullUrl">none</span></span>
   </div>
 
   <div class="presenter-strip">
@@ -1523,15 +1524,18 @@ function renderCanvasIdentityTest() {
   const loginId = decodeQueryValue(query.get('loginId')) || decodeQueryValue(query.get('login')) || 'not provided';
   const sisId = decodeQueryValue(query.get('sisId')) || 'not provided';
   const rawQuery = window.location.search || 'none';
+  const fullUrl = window.location.href || 'none';
 
   const userIdEl = document.getElementById('canvasUserId');
   const loginIdEl = document.getElementById('canvasLoginId');
   const sisIdEl = document.getElementById('canvasSisId');
   const queryEl = document.getElementById('canvasQuery');
+  const fullUrlEl = document.getElementById('canvasFullUrl');
   if (userIdEl) userIdEl.textContent = userId;
   if (loginIdEl) loginIdEl.textContent = loginId;
   if (sisIdEl) sisIdEl.textContent = sisId;
   if (queryEl) queryEl.textContent = rawQuery;
+  if (fullUrlEl) fullUrlEl.textContent = fullUrl;
 }
 
 function getActiveIssue() {

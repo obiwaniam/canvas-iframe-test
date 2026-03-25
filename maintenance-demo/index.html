@@ -544,6 +544,29 @@
 
   .presenter-strip strong { color: var(--primary); }
 
+  .canvas-test-bar {
+    border: 1px solid #bfdbfe;
+    background: #eff6ff;
+    color: #1e3a8a;
+    border-radius: 12px;
+    padding: 8px 12px;
+    margin-bottom: 12px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    align-items: center;
+    font-size: 13px;
+  }
+
+  .canvas-test-bar strong {
+    color: #1d4ed8;
+  }
+
+  .canvas-test-value {
+    color: #0f172a;
+    font-weight: 700;
+  }
+
   .a11y-toggle-wrap {
     position: absolute;
     top: -10px;
@@ -1044,6 +1067,12 @@
     <p>Choose a room, spot visible issues, and decide what a resident or property owner should do next.</p>
   </div>
 
+  <div class="canvas-test-bar" id="canvasIdentityBar">
+    <strong>Canvas redirect test:</strong>
+    <span>User ID: <span class="canvas-test-value" id="canvasUserId">not provided</span></span>
+    <span>Name: <span class="canvas-test-value" id="canvasUserName">not provided</span></span>
+  </div>
+
   <div class="presenter-strip">
     <div><strong>Big-screen flow:</strong> Start on the floorplan, open any room, click one hotspot, and choose one action to show how the learning works.</div>
     <div class="score-pill">Solved overall: <span id="solvedCount">0</span>/<span id="totalIssues">12</span></div>
@@ -1468,6 +1497,26 @@ function initA11yMode() {
   });
 }
 
+function decodeQueryValue(value) {
+  if (!value) return null;
+  try {
+    return decodeURIComponent(value.replace(/\+/g, ' '));
+  } catch {
+    return value;
+  }
+}
+
+function renderCanvasIdentityTest() {
+  const query = new URLSearchParams(window.location.search);
+  const userId = decodeQueryValue(query.get('userId')) || 'not provided';
+  const userName = decodeQueryValue(query.get('name')) || 'not provided';
+
+  const userIdEl = document.getElementById('canvasUserId');
+  const userNameEl = document.getElementById('canvasUserName');
+  if (userIdEl) userIdEl.textContent = userId;
+  if (userNameEl) userNameEl.textContent = userName;
+}
+
 function getActiveIssue() {
   if (!activeRoomId || !activeIssueId) return null;
   return rooms[activeRoomId].issues.find((item) => item.id === activeIssueId) || null;
@@ -1796,6 +1845,7 @@ document.addEventListener('keydown', (event) => {
 });
 
 initA11yMode();
+renderCanvasIdentityTest();
 updateProgress();
 showFloorplan();
 </script>

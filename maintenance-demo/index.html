@@ -567,6 +567,15 @@
     font-weight: 700;
   }
 
+  .canvas-test-query {
+    display: block;
+    width: 100%;
+    font-family: Consolas, "Courier New", monospace;
+    font-size: 12px;
+    color: #334155;
+    overflow-wrap: anywhere;
+  }
+
   .a11y-toggle-wrap {
     position: absolute;
     top: -10px;
@@ -1069,8 +1078,10 @@
 
   <div class="canvas-test-bar" id="canvasIdentityBar">
     <strong>Canvas redirect test:</strong>
-    <span>User ID: <span class="canvas-test-value" id="canvasUserId">not provided</span></span>
-    <span>Name: <span class="canvas-test-value" id="canvasUserName">not provided</span></span>
+    <span>Canvas User ID: <span class="canvas-test-value" id="canvasUserId">not provided</span></span>
+    <span>Login ID: <span class="canvas-test-value" id="canvasLoginId">not provided</span></span>
+    <span>SIS ID: <span class="canvas-test-value" id="canvasSisId">not provided</span></span>
+    <span class="canvas-test-query">Query: <span class="canvas-test-value" id="canvasQuery">none</span></span>
   </div>
 
   <div class="presenter-strip">
@@ -1508,13 +1519,19 @@ function decodeQueryValue(value) {
 
 function renderCanvasIdentityTest() {
   const query = new URLSearchParams(window.location.search);
-  const userId = decodeQueryValue(query.get('userId')) || 'not provided';
-  const userName = decodeQueryValue(query.get('name')) || 'not provided';
+  const userId = decodeQueryValue(query.get('canvasUserId')) || decodeQueryValue(query.get('userId')) || 'not provided';
+  const loginId = decodeQueryValue(query.get('loginId')) || decodeQueryValue(query.get('login')) || 'not provided';
+  const sisId = decodeQueryValue(query.get('sisId')) || 'not provided';
+  const rawQuery = window.location.search || 'none';
 
   const userIdEl = document.getElementById('canvasUserId');
-  const userNameEl = document.getElementById('canvasUserName');
+  const loginIdEl = document.getElementById('canvasLoginId');
+  const sisIdEl = document.getElementById('canvasSisId');
+  const queryEl = document.getElementById('canvasQuery');
   if (userIdEl) userIdEl.textContent = userId;
-  if (userNameEl) userNameEl.textContent = userName;
+  if (loginIdEl) loginIdEl.textContent = loginId;
+  if (sisIdEl) sisIdEl.textContent = sisId;
+  if (queryEl) queryEl.textContent = rawQuery;
 }
 
 function getActiveIssue() {

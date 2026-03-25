@@ -544,6 +544,30 @@
 
   .presenter-strip strong { color: var(--primary); }
 
+  .presenter-controls {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+  }
+
+  .retake-btn {
+    border: 1px solid #bfdbfe;
+    background: #eff6ff;
+    color: #1d4ed8;
+    border-radius: 999px;
+    padding: 8px 12px;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+  }
+
+  .retake-btn:disabled {
+    opacity: 0.55;
+    cursor: default;
+  }
+
   .a11y-toggle-wrap {
     position: absolute;
     top: -10px;
@@ -1046,7 +1070,10 @@
 
   <div class="presenter-strip">
     <div><strong>Big-screen flow:</strong> Start on the floorplan, open any room, click one hotspot, and choose one action to show how the learning works.</div>
-    <div class="score-pill">Solved overall: <span id="solvedCount">0</span>/<span id="totalIssues">12</span></div>
+    <div class="presenter-controls">
+      <div class="score-pill">Solved overall: <span id="solvedCount">0</span>/<span id="totalIssues">12</span></div>
+      <button class="retake-btn" id="retakeBtn" type="button" onclick="startNewAttempt()">Start new attempt</button>
+    </div>
   </div>
 
   <div class="layout">
@@ -1124,6 +1151,7 @@
 </div>
 <div class="sr-only" id="srAnnouncements" role="status" aria-live="polite" aria-atomic="true"></div>
 
+<script src="reporting-config.js"></script>
 <script>
 const rooms = {
   bathroom: {
@@ -1401,8 +1429,25 @@ const solvedByRoom = Object.fromEntries(roomOrder.map((roomId) => [roomId, new S
 let activeRoomId = null;
 let activeIssueId = null;
 let lastIssueTrigger = null;
+const sentScoreEvents = new Set();
 const A11Y_STORAGE_KEY = 'maintenanceDemoScreenReaderMode';
+const ATTEMPT_CONFIG = {
+  allowRetakes: true,
+  maxAttempts: 0,
+  scorePolicy: 'best',
+  minSecondsBetweenAttempts: 0
+};
+const REPORT_CONFIG = {
+  endpoint: window.MAINTENANCE_REPORT_ENDPOINT || '',
+  allowQueryParamEndpoint: false
+};
 let a11yMode = false;
+let attemptStorageKey = 'maintenanceDemoAttempts:default';
+let completedAttempts = 0;
+let currentAttemptNumber = 1;
+let attemptStartedAt = '';
+let lastAttemptCompletedAt = '';
+let bestPercent = 0;
 
 function readA11yModeSetting() {
   try {
@@ -1497,21 +1542,207 @@ function buildStageTitle() {
   return firstName ? `${firstName} - Select a room to inspect` : 'Select a room to inspect';
 }
 
+function totalIssueCount() {
+  return roomOrder.reduce((sum, roomId) => sum + issueCount(roomId), 0);
+}
+
+function attemptStateSnapshot() {
+  return {
+    completedAttempts,
+    currentAttemptNumber,
+    bestPercent,
+    lastAttemptCompletedAt
+  };
+}
+
+function persistAttemptState() {
+  try {
+    window.localStorage.setItem(attemptStorageKey, JSON.stringify(attemptStateSnapshot()));
+  } catch {
+    // Ignore localStorage write issues.
+  }
+}
+
+function loadAttemptState() {
+  try {
+    const raw = window.localStorage.getItem(attemptStorageKey);
+    if (!raw) return;
+    const parsed = JSON.parse(raw);
+    completedAttempts = Number(parsed.completedAttempts || 0);
+    currentAttemptNumber = Number(parsed.currentAttemptNumber || (completedAttempts + 1));
+    bestPercent = Number(parsed.bestPercent || 0);
+    lastAttemptCompletedAt = parsed.lastAttemptCompletedAt || '';
+  } catch {
+    completedAttempts = 0;
+    currentAttemptNumber = 1;
+    bestPercent = 0;
+    lastAttemptCompletedAt = '';
+  }
+}
+
+function canStartNewAttempt() {
+  if (!ATTEMPT_CONFIG.allowRetakes && completedAttempts > 0) return false;
+  if (ATTEMPT_CONFIG.maxAttempts > 0 && currentAttemptNumber > ATTEMPT_CONFIG.maxAttempts) return false;
+  if (ATTEMPT_CONFIG.minSecondsBetweenAttempts > 0 && lastAttemptCompletedAt) {
+    const elapsedMs = Date.now() - Date.parse(lastAttemptCompletedAt);
+    if (Number.isFinite(elapsedMs) && elapsedMs < ATTEMPT_CONFIG.minSecondsBetweenAttempts * 1000) return false;
+  }
+  return true;
+}
+
+function updateRetakeControl() {
+  const retakeBtn = document.getElementById('retakeBtn');
+  if (!retakeBtn) return;
+  const allowed = canStartNewAttempt();
+  retakeBtn.disabled = !allowed;
+  if (!allowed && ATTEMPT_CONFIG.maxAttempts > 0 && currentAttemptNumber > ATTEMPT_CONFIG.maxAttempts) {
+    retakeBtn.textContent = 'Attempt limit reached';
+  } else {
+    retakeBtn.textContent = 'Start new attempt';
+  }
+}
+
+function beginAttempt() {
+  sentScoreEvents.clear();
+  attemptStartedAt = new Date().toISOString();
+  persistAttemptState();
+  updateRetakeControl();
+}
+
+function finalizeAttempt(percent) {
+  completedAttempts += 1;
+  lastAttemptCompletedAt = new Date().toISOString();
+  bestPercent = Math.max(bestPercent, percent);
+  if (ATTEMPT_CONFIG.maxAttempts > 0) {
+    currentAttemptNumber = Math.min(completedAttempts + 1, ATTEMPT_CONFIG.maxAttempts + 1);
+  } else {
+    currentAttemptNumber = completedAttempts + 1;
+  }
+  persistAttemptState();
+  updateRetakeControl();
+}
+
+function startNewAttempt() {
+  if (!canStartNewAttempt()) return;
+  roomOrder.forEach((roomId) => {
+    solvedByRoom[roomId].clear();
+  });
+  beginAttempt();
+  showFloorplan();
+}
+
 function readCanvasIdentity() {
   const query = new URLSearchParams(window.location.search);
   const userId = decodeQueryValue(query.get('canvasUserId')) || decodeQueryValue(query.get('userId')) || '';
   const loginId = decodeQueryValue(query.get('loginId')) || decodeQueryValue(query.get('login')) || '';
   const sisId = decodeQueryValue(query.get('sisId')) || '';
+  const courseId = decodeQueryValue(query.get('courseId')) || '';
+  const courseName = decodeQueryValue(query.get('courseName')) || '';
+  const contextId = decodeQueryValue(query.get('contextId')) || '';
+  const activityKey = decodeQueryValue(query.get('activityKey')) || '';
+  const reportUrl = decodeQueryValue(query.get('reportUrl')) || '';
   const firstName = decodeQueryValue(query.get('firstName')) || decodeQueryValue(query.get('givenName')) || decodeQueryValue(query.get('personGivenName')) || '';
   const lastName = decodeQueryValue(query.get('lastName')) || decodeQueryValue(query.get('familyName')) || decodeQueryValue(query.get('personFamilyName')) || '';
 
   const parsedFromLogin = parseNameFromLogin(loginId);
+  const routeCourseKey = courseId || contextId || 'default';
+  const routeActivityKey = activityKey || 'default';
+  attemptStorageKey = `maintenanceDemoAttempts:${routeCourseKey}:${routeActivityKey}:${userId || loginId || 'anon'}`;
 
   document.body.dataset.canvasUserId = userId;
   document.body.dataset.canvasLoginId = loginId;
   document.body.dataset.canvasSisId = sisId;
+  document.body.dataset.canvasCourseId = courseId;
+  document.body.dataset.canvasCourseName = courseName;
+  document.body.dataset.canvasContextId = contextId;
+  document.body.dataset.canvasActivityKey = activityKey;
+  document.body.dataset.canvasReportUrl = reportUrl;
   document.body.dataset.canvasFirstName = firstName || parsedFromLogin.firstName || '';
   document.body.dataset.canvasLastName = lastName || parsedFromLogin.lastName || '';
+  loadAttemptState();
+  updateRetakeControl();
+}
+
+function scoreSnapshot() {
+  const solvedOverall = totalSolvedCount();
+  const totalOverall = totalIssueCount();
+  const completedRooms = completedRoomCount();
+  const percent = totalOverall > 0 ? Math.round((solvedOverall / totalOverall) * 100) : 0;
+  return { solvedOverall, totalOverall, completedRooms, percent };
+}
+
+function sendScoreEvent(eventType) {
+  const endpoint = REPORT_CONFIG.endpoint || (REPORT_CONFIG.allowQueryParamEndpoint ? document.body.dataset.canvasReportUrl : '');
+
+  const snapshot = scoreSnapshot();
+  const dedupeKey = `${eventType}:${snapshot.solvedOverall}:${snapshot.completedRooms}`;
+  if (sentScoreEvents.has(dedupeKey)) return;
+  sentScoreEvents.add(dedupeKey);
+
+  const payload = {
+    eventType,
+    timestamp: new Date().toISOString(),
+    activityKey: document.body.dataset.canvasActivityKey || '',
+    userId: document.body.dataset.canvasUserId || '',
+    loginId: document.body.dataset.canvasLoginId || '',
+    sisId: document.body.dataset.canvasSisId || '',
+    firstName: document.body.dataset.canvasFirstName || '',
+    lastName: document.body.dataset.canvasLastName || '',
+    courseId: document.body.dataset.canvasCourseId || '',
+    courseName: document.body.dataset.canvasCourseName || '',
+    contextId: document.body.dataset.canvasContextId || '',
+    attemptNumber: currentAttemptNumber,
+    completedAttempts,
+    attemptStartedAt,
+    attemptCompletedAt: eventType === 'complete' ? new Date().toISOString() : '',
+    scorePolicy: ATTEMPT_CONFIG.scorePolicy,
+    bestPercent,
+    score: snapshot.solvedOverall,
+    maxScore: snapshot.totalOverall,
+    percent: snapshot.percent,
+    completedRooms: snapshot.completedRooms,
+    totalRooms: roomOrder.length
+  };
+
+  if (typeof window.MAINTENANCE_REPORT_HANDLER === 'function') {
+    try {
+      window.MAINTENANCE_REPORT_HANDLER(payload);
+    } catch {
+      // Ignore local handler failures; learner flow must continue.
+    }
+  }
+
+  if (!endpoint) return;
+
+  const body = new URLSearchParams();
+  Object.entries(payload).forEach(([key, value]) => {
+    body.append(key, String(value ?? ''));
+  });
+  const bodyString = body.toString();
+
+  let sent = false;
+  if (navigator.sendBeacon) {
+    try {
+      const blob = new Blob([bodyString], { type: 'application/x-www-form-urlencoded;charset=UTF-8' });
+      sent = navigator.sendBeacon(endpoint, blob);
+    } catch {
+      sent = false;
+    }
+  }
+
+  if (!sent) {
+    fetch(endpoint, {
+      method: 'POST',
+      mode: 'no-cors',
+      keepalive: true,
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8'
+      },
+      body: bodyString
+    }).catch(() => {
+      // Silent failure; scoring should not interrupt learner flow.
+    });
+  }
 }
 
 function getActiveIssue() {
@@ -1780,6 +2011,7 @@ function chooseAnswer(choiceIndex, clickedButton) {
     renderHotspots();
     renderA11yIssueList();
     updateProgress();
+    sendScoreEvent('progress');
     issueFeedback.className = 'issue-feedback show correct';
     issueFeedback.innerHTML = `
       Correct.
@@ -1792,15 +2024,16 @@ function chooseAnswer(choiceIndex, clickedButton) {
       document.getElementById('stageNote').textContent = 'All issues in this room have been completed.';
       showRoomCompleteBanner(activeRoomId);
     }
+    if (totalSolvedCount() === totalIssueCount()) {
+      const snapshot = scoreSnapshot();
+      finalizeAttempt(snapshot.percent);
+      sendScoreEvent('complete');
+    }
   }
 }
 
 function resetDemo() {
-  roomOrder.forEach((roomId) => {
-    solvedByRoom[roomId].clear();
-  });
-  closeIssueCard({ restoreFocus: false });
-  showFloorplan();
+  startNewAttempt();
 }
 
 function getFocusableElements(container) {
@@ -1843,6 +2076,7 @@ document.addEventListener('keydown', (event) => {
 
 initA11yMode();
 readCanvasIdentity();
+beginAttempt();
 updateProgress();
 showFloorplan();
 </script>

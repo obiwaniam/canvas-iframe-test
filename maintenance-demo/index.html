@@ -1704,14 +1704,6 @@ function sendScoreEvent(eventType) {
     totalRooms: roomOrder.length
   };
 
-  if (typeof window.MAINTENANCE_REPORT_HANDLER === 'function') {
-    try {
-      window.MAINTENANCE_REPORT_HANDLER(payload);
-    } catch {
-      // Ignore local handler failures; learner flow must continue.
-    }
-  }
-
   if (!endpoint) return;
 
   const body = new URLSearchParams();

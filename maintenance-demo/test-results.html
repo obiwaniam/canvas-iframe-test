@@ -133,26 +133,32 @@
         <button class="btn" id="refreshBtn" type="button">Refresh</button>
         <button class="btn" id="copyBtn" type="button">Copy JSON</button>
         <button class="btn" id="downloadBtn" type="button">Download JSON</button>
-        <button class="btn btn-danger" id="clearBtn" type="button">Clear Results</button>
       </div>
     </div>
-    <div class="note">This page reads local test events stored by the maintenance demo in this browser profile.</div>
+    <div class="note">This page reads server-side score events from the configured reporting endpoint.</div>
     <div class="summary" id="summary">Loading…</div>
     <div class="panel">
       <div class="table-wrap" id="tableWrap"></div>
     </div>
   </div>
 
+<script src="reporting-config.js"></script>
 <script>
-const STORAGE_KEY = 'maintenanceDemoScoreEvents';
+let currentEvents = [];
 
-function readEvents() {
-  try {
-    const data = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
-    return Array.isArray(data) ? data : [];
-  } catch {
-    return [];
+async function readEvents() {
+  const endpoint = window.MAINTENANCE_RESULTS_ENDPOINT || '';
+  if (!endpoint) {
+    throw new Error('MAINTENANCE_RESULTS_ENDPOINT is not configured in reporting-config.js');
   }
+  const response = await fetch(endpoint, { method: 'GET', credentials: 'omit' });
+  if (!response.ok) {
+    throw new Error(`Results endpoint error: ${response.status}`);
+  }
+  const data = await response.json();
+  if (Array.isArray(data)) return data;
+  if (Array.isArray(data.events)) return data.events;
+  return [];
 }
 
 function renderSummary(events) {
@@ -207,21 +213,28 @@ function renderTable(events) {
   `;
 }
 
-function render() {
-  const events = readEvents();
-  renderSummary(events);
-  renderTable(events);
+async function render() {
+  const summary = document.getElementById('summary');
+  summary.textContent = 'Loading…';
+  try {
+    const events = await readEvents();
+    currentEvents = events;
+    renderSummary(events);
+    renderTable(events);
+  } catch (error) {
+    currentEvents = [];
+    summary.textContent = `Unable to load results. ${error.message}`;
+    document.getElementById('tableWrap').innerHTML = '<div class="empty">Configure MAINTENANCE_RESULTS_ENDPOINT in reporting-config.js and ensure the endpoint returns JSON.</div>';
+  }
 }
 
 async function copyJson() {
-  const events = readEvents();
-  const text = JSON.stringify(events, null, 2);
+  const text = JSON.stringify(currentEvents, null, 2);
   await navigator.clipboard.writeText(text);
 }
 
 function downloadJson() {
-  const events = readEvents();
-  const blob = new Blob([JSON.stringify(events, null, 2)], { type: 'application/json' });
+  const blob = new Blob([JSON.stringify(currentEvents, null, 2)], { type: 'application/json' });
   const link = document.createElement('a');
   link.href = URL.createObjectURL(blob);
   link.download = `maintenance-demo-results-${new Date().toISOString().replace(/[:.]/g, '-')}.json`;
@@ -229,17 +242,9 @@ function downloadJson() {
   URL.revokeObjectURL(link.href);
 }
 
-function clearResults() {
-  const ok = window.confirm('Clear all locally stored test results for this browser?');
-  if (!ok) return;
-  localStorage.removeItem(STORAGE_KEY);
-  render();
-}
-
 document.getElementById('refreshBtn').addEventListener('click', render);
 document.getElementById('copyBtn').addEventListener('click', () => copyJson().catch(() => {}));
 document.getElementById('downloadBtn').addEventListener('click', downloadJson);
-document.getElementById('clearBtn').addEventListener('click', clearResults);
 
 render();
 </script>

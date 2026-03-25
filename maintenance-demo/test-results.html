@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Maintenance Demo Test Results</title>
+<style>
+  :root {
+    --bg: #f8fbff;
+    --card: #ffffff;
+    --text: #1f2937;
+    --muted: #6b7280;
+    --border: #dbe4f0;
+    --primary: #1d4ed8;
+    --danger: #dc2626;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    font-family: Arial, Helvetica, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+  }
+
+  .app {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 24px;
+  }
+
+  .head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-bottom: 14px;
+  }
+
+  h1 {
+    margin: 0;
+    font-size: clamp(26px, 4vw, 38px);
+  }
+
+  .note {
+    color: var(--muted);
+    margin-bottom: 16px;
+  }
+
+  .toolbar {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+
+  .btn {
+    border: 1px solid #bfdbfe;
+    border-radius: 10px;
+    background: #eff6ff;
+    color: var(--primary);
+    font-weight: 700;
+    cursor: pointer;
+    padding: 9px 12px;
+    font-size: 13px;
+  }
+
+  .btn-danger {
+    border-color: #fecaca;
+    background: #fef2f2;
+    color: var(--danger);
+  }
+
+  .summary {
+    border: 1px solid var(--border);
+    background: var(--card);
+    border-radius: 12px;
+    padding: 10px 12px;
+    margin-bottom: 14px;
+    font-size: 14px;
+  }
+
+  .panel {
+    border: 1px solid var(--border);
+    background: var(--card);
+    border-radius: 14px;
+    overflow: hidden;
+  }
+
+  .table-wrap {
+    overflow: auto;
+    max-height: 68vh;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 1000px;
+    font-size: 13px;
+  }
+
+  thead th {
+    position: sticky;
+    top: 0;
+    background: #eff6ff;
+    color: #1e3a8a;
+    text-align: left;
+    padding: 10px 8px;
+    border-bottom: 1px solid var(--border);
+    white-space: nowrap;
+  }
+
+  tbody td {
+    border-bottom: 1px solid #eef2f7;
+    padding: 8px;
+    vertical-align: top;
+  }
+
+  tbody tr:nth-child(even) { background: #fbfdff; }
+
+  .empty {
+    padding: 22px;
+    color: var(--muted);
+  }
+</style>
+</head>
+<body>
+  <div class="app">
+    <div class="head">
+      <h1>Maintenance Demo Test Results</h1>
+      <div class="toolbar">
+        <button class="btn" id="refreshBtn" type="button">Refresh</button>
+        <button class="btn" id="copyBtn" type="button">Copy JSON</button>
+        <button class="btn" id="downloadBtn" type="button">Download JSON</button>
+        <button class="btn btn-danger" id="clearBtn" type="button">Clear Results</button>
+      </div>
+    </div>
+    <div class="note">This page reads local test events stored by the maintenance demo in this browser profile.</div>
+    <div class="summary" id="summary">Loading…</div>
+    <div class="panel">
+      <div class="table-wrap" id="tableWrap"></div>
+    </div>
+  </div>
+
+<script>
+const STORAGE_KEY = 'maintenanceDemoScoreEvents';
+
+function readEvents() {
+  try {
+    const data = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+    return Array.isArray(data) ? data : [];
+  } catch {
+    return [];
+  }
+}
+
+function renderSummary(events) {
+  const complete = events.filter((event) => event.eventType === 'complete');
+  const latest = complete.at(-1);
+  const latestLabel = latest
+    ? `${latest.score}/${latest.maxScore} (${latest.percent}%) on attempt ${latest.attemptNumber || '?'}`
+    : 'No completed attempts yet';
+  document.getElementById('summary').textContent = `Total events: ${events.length} | Completed attempts: ${complete.length} | Latest complete: ${latestLabel}`;
+}
+
+function cell(value) {
+  if (value === undefined || value === null || value === '') return '—';
+  return String(value);
+}
+
+function renderTable(events) {
+  const wrap = document.getElementById('tableWrap');
+  if (!events.length) {
+    wrap.innerHTML = '<div class="empty">No stored events yet. Complete at least one issue in the demo, then press Refresh.</div>';
+    return;
+  }
+
+  const columns = [
+    'timestamp',
+    'eventType',
+    'activityKey',
+    'courseId',
+    'userId',
+    'loginId',
+    'attemptNumber',
+    'completedAttempts',
+    'score',
+    'maxScore',
+    'percent',
+    'bestPercent',
+    'attemptStartedAt',
+    'attemptCompletedAt'
+  ];
+
+  const rows = [...events].reverse().map((event) => (
+    `<tr>${columns.map((key) => `<td>${cell(event[key])}</td>`).join('')}</tr>`
+  )).join('');
+
+  wrap.innerHTML = `
+    <table>
+      <thead>
+        <tr>${columns.map((key) => `<th>${key}</th>`).join('')}</tr>
+      </thead>
+      <tbody>${rows}</tbody>
+    </table>
+  `;
+}
+
+function render() {
+  const events = readEvents();
+  renderSummary(events);
+  renderTable(events);
+}
+
+async function copyJson() {
+  const events = readEvents();
+  const text = JSON.stringify(events, null, 2);
+  await navigator.clipboard.writeText(text);
+}
+
+function downloadJson() {
+  const events = readEvents();
+  const blob = new Blob([JSON.stringify(events, null, 2)], { type: 'application/json' });
+  const link = document.createElement('a');
+  link.href = URL.createObjectURL(blob);
+  link.download = `maintenance-demo-results-${new Date().toISOString().replace(/[:.]/g, '-')}.json`;
+  link.click();
+  URL.revokeObjectURL(link.href);
+}
+
+function clearResults() {
+  const ok = window.confirm('Clear all locally stored test results for this browser?');
+  if (!ok) return;
+  localStorage.removeItem(STORAGE_KEY);
+  render();
+}
+
+document.getElementById('refreshBtn').addEventListener('click', render);
+document.getElementById('copyBtn').addEventListener('click', () => copyJson().catch(() => {}));
+document.getElementById('downloadBtn').addEventListener('click', downloadJson);
+document.getElementById('clearBtn').addEventListener('click', clearResults);
+
+render();
+</script>
+</body>
+</html>

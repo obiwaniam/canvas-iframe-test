@@ -1680,51 +1680,97 @@ function sendFinalScore(eventType) {
   finalScoreSent = true;
 
   const endpoint = REPORT_CONFIG.endpoint || '';
-  const now = new Date().toISOString();
-  const payload = {
-    eventType,
-    timestamp: now,
-    activityKey: document.body.dataset.canvasActivityKey || '',
-    userId: document.body.dataset.canvasUserId || '',
-    loginId: document.body.dataset.canvasLoginId || '',
-    sisId: document.body.dataset.canvasSisId || '',
-    firstName: document.body.dataset.canvasFirstName || '',
-    lastName: document.body.dataset.canvasLastName || '',
-    courseId: document.body.dataset.canvasCourseId || '',
-    courseName: document.body.dataset.canvasCourseName || '',
-    contextId: document.body.dataset.canvasContextId || '',
-    attemptNumber: currentAttemptNumber,
-    completedAttempts,
-    attemptStartedAt,
-    attemptCompletedAt: now,
-    scorePolicy: ATTEMPT_CONFIG.scorePolicy,
-    bestPercent,
-    score: snapshot.solvedOverall,
-    maxScore: snapshot.totalOverall,
-    percent: snapshot.percent,
-    completedRooms: snapshot.completedRooms,
-    totalRooms: roomOrder.length
-  };
-
   if (!endpoint) return;
 
-  const body = new URLSearchParams();
-  Object.entries(payload).forEach(([key, value]) => {
-    body.append(key, String(value ?? ''));
-  });
-  const bodyString = body.toString();
-  const blob = new Blob([bodyString], { type: 'application/x-www-form-urlencoded;charset=UTF-8' });
+  const resultsEndpoint = window.MAINTENANCE_RESULTS_ENDPOINT || '';
+  const userId = document.body.dataset.canvasUserId || '';
+  const activityKey = document.body.dataset.canvasActivityKey || '';
+  const courseId = document.body.dataset.canvasCourseId || '';
 
-  if (navigator.sendBeacon) {
-    navigator.sendBeacon(endpoint, blob);
+  const COLUMNS = [
+    'timestamp','eventType','activityKey','courseId','courseName','contextId',
+    'userId','loginId','sisId','firstName','lastName',
+    'attemptNumber','completedAttempts','attemptStartedAt','attemptCompletedAt',
+    'scorePolicy','bestPercent','score','maxScore','percent','completedRooms','totalRooms'
+  ];
+
+  function buildAndSend(prevAttempt, prevCompleted, prevBest) {
+    const newAttempt = prevAttempt + 1;
+    const newCompleted = eventType === 'complete' ? prevCompleted + 1 : prevCompleted;
+    const newBest = Math.max(prevBest, snapshot.percent);
+    const now = new Date().toISOString();
+
+    const payload = {
+      _keys: 'userId,activityKey,courseId',
+      _columns: COLUMNS.join(','),
+      timestamp: now,
+      eventType,
+      activityKey,
+      courseId,
+      courseName: document.body.dataset.canvasCourseName || '',
+      contextId: document.body.dataset.canvasContextId || '',
+      userId,
+      loginId: document.body.dataset.canvasLoginId || '',
+      sisId: document.body.dataset.canvasSisId || '',
+      firstName: document.body.dataset.canvasFirstName || '',
+      lastName: document.body.dataset.canvasLastName || '',
+      attemptNumber: newAttempt,
+      completedAttempts: newCompleted,
+      attemptStartedAt,
+      attemptCompletedAt: now,
+      scorePolicy: ATTEMPT_CONFIG.scorePolicy,
+      bestPercent: newBest,
+      score: snapshot.solvedOverall,
+      maxScore: snapshot.totalOverall,
+      percent: snapshot.percent,
+      completedRooms: snapshot.completedRooms,
+      totalRooms: roomOrder.length
+    };
+
+    const body = new URLSearchParams();
+    Object.entries(payload).forEach(([key, value]) => {
+      body.append(key, String(value ?? ''));
+    });
+    const bodyString = body.toString();
+    const blob = new Blob([bodyString], { type: 'application/x-www-form-urlencoded;charset=UTF-8' });
+
+    if (navigator.sendBeacon) {
+      navigator.sendBeacon(endpoint, blob);
+    } else {
+      fetch(endpoint, {
+        method: 'POST',
+        mode: 'no-cors',
+        keepalive: true,
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8' },
+        body: bodyString
+      }).catch(() => {});
+    }
+  }
+
+  if (resultsEndpoint && userId) {
+    fetch(resultsEndpoint, { method: 'GET', credentials: 'omit' })
+      .then((r) => r.json())
+      .then((rows) => {
+        const existing = rows.find((row) =>
+          String(row.userId) === userId &&
+          String(row.activityKey) === activityKey &&
+          String(row.courseId) === courseId
+        );
+        if (existing) {
+          buildAndSend(
+            Number(existing.attemptNumber) || 0,
+            Number(existing.completedAttempts) || 0,
+            Number(existing.bestPercent) || 0
+          );
+        } else {
+          buildAndSend(0, 0, 0);
+        }
+      })
+      .catch(() => {
+        buildAndSend(0, 0, 0);
+      });
   } else {
-    fetch(endpoint, {
-      method: 'POST',
-      mode: 'no-cors',
-      keepalive: true,
-      headers: { 'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8' },
-      body: bodyString
-    }).catch(() => {});
+    buildAndSend(0, 0, 0);
   }
 }
 

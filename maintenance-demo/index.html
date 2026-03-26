@@ -2003,7 +2003,6 @@ function chooseAnswer(choiceIndex, clickedButton) {
     renderHotspots();
     renderA11yIssueList();
     updateProgress();
-    sendScoreEvent('progress');
     issueFeedback.className = 'issue-feedback show correct';
     issueFeedback.innerHTML = `
       Correct.

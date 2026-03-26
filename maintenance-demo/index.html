@@ -1429,7 +1429,7 @@ const solvedByRoom = Object.fromEntries(roomOrder.map((roomId) => [roomId, new S
 let activeRoomId = null;
 let activeIssueId = null;
 let lastIssueTrigger = null;
-const sentScoreEvents = new Set();
+let finalScoreSent = false;
 const A11Y_STORAGE_KEY = 'maintenanceDemoScreenReaderMode';
 const ATTEMPT_CONFIG = {
   allowRetakes: true,
@@ -1603,7 +1603,7 @@ function updateRetakeControl() {
 }
 
 function beginAttempt() {
-  sentScoreEvents.clear();
+  finalScoreSent = false;
   attemptStartedAt = new Date().toISOString();
   persistAttemptState();
   updateRetakeControl();
@@ -1671,17 +1671,19 @@ function scoreSnapshot() {
   return { solvedOverall, totalOverall, completedRooms, percent };
 }
 
-function sendScoreEvent(eventType) {
-  const endpoint = REPORT_CONFIG.endpoint || (REPORT_CONFIG.allowQueryParamEndpoint ? document.body.dataset.canvasReportUrl : '');
+function sendFinalScore(eventType) {
+  if (finalScoreSent) return;
 
   const snapshot = scoreSnapshot();
-  const dedupeKey = `${eventType}:${snapshot.solvedOverall}:${snapshot.completedRooms}`;
-  if (sentScoreEvents.has(dedupeKey)) return;
-  sentScoreEvents.add(dedupeKey);
+  if (snapshot.solvedOverall === 0) return;
 
+  finalScoreSent = true;
+
+  const endpoint = REPORT_CONFIG.endpoint || '';
+  const now = new Date().toISOString();
   const payload = {
     eventType,
-    timestamp: new Date().toISOString(),
+    timestamp: now,
     activityKey: document.body.dataset.canvasActivityKey || '',
     userId: document.body.dataset.canvasUserId || '',
     loginId: document.body.dataset.canvasLoginId || '',
@@ -1694,7 +1696,7 @@ function sendScoreEvent(eventType) {
     attemptNumber: currentAttemptNumber,
     completedAttempts,
     attemptStartedAt,
-    attemptCompletedAt: eventType === 'complete' ? new Date().toISOString() : '',
+    attemptCompletedAt: now,
     scorePolicy: ATTEMPT_CONFIG.scorePolicy,
     bestPercent,
     score: snapshot.solvedOverall,
@@ -1711,29 +1713,18 @@ function sendScoreEvent(eventType) {
     body.append(key, String(value ?? ''));
   });
   const bodyString = body.toString();
+  const blob = new Blob([bodyString], { type: 'application/x-www-form-urlencoded;charset=UTF-8' });
 
-  let sent = false;
   if (navigator.sendBeacon) {
-    try {
-      const blob = new Blob([bodyString], { type: 'application/x-www-form-urlencoded;charset=UTF-8' });
-      sent = navigator.sendBeacon(endpoint, blob);
-    } catch {
-      sent = false;
-    }
-  }
-
-  if (!sent) {
+    navigator.sendBeacon(endpoint, blob);
+  } else {
     fetch(endpoint, {
       method: 'POST',
       mode: 'no-cors',
       keepalive: true,
-      headers: {
-        'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8'
-      },
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8' },
       body: bodyString
-    }).catch(() => {
-      // Silent failure; scoring should not interrupt learner flow.
-    });
+    }).catch(() => {});
   }
 }
 
@@ -2018,7 +2009,7 @@ function chooseAnswer(choiceIndex, clickedButton) {
     if (totalSolvedCount() === totalIssueCount()) {
       const snapshot = scoreSnapshot();
       finalizeAttempt(snapshot.percent);
-      sendScoreEvent('complete');
+      sendFinalScore('complete');
     }
   }
 }
@@ -2064,6 +2055,11 @@ document.addEventListener('keydown', (event) => {
     first.focus();
   }
 });
+
+document.addEventListener('visibilitychange', () => {
+  if (document.visibilityState === 'hidden') sendFinalScore('partial');
+});
+window.addEventListener('pagehide', () => sendFinalScore('partial'));
 
 initA11yMode();
 readCanvasIdentity();

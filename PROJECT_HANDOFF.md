@@ -161,6 +161,129 @@ Relevant functions / elements:
 - `#srAnnouncements`
 - `#a11yIssueList`
 
+## Canvas LTI Integration (Redirect Plus)
+
+The maintenance demo is designed to be launched from Canvas using the **Redirect Plus** external tool. Redirect Plus passes Canvas user and course data as URL query parameters using LTI variable substitution.
+
+### Redirect Plus Configuration
+
+In the Canvas External Tool configuration for Redirect Plus, the custom fields `url=` line should look like:
+
+```
+url=https://obiwaniam.github.io/canvas-iframe-test/maintenance-demo/?activityKey=Mod1Act1&canvasUserId=${Canvas.user.id}&loginId=${Canvas.user.loginId}&sisId=${Canvas.user.sisSourceId}&courseId=${Canvas.course.id}&courseName=${Canvas.course.name}&contextId=${Context.id}
+new_tab=false
+```
+
+Important configuration details:
+
+- **Privacy Level** must be set to **Public** for Canvas to substitute the user variables.
+- The module item must be configured as an **External Tool** (Redirect Plus), not a static Canvas page iframe.
+- Use `${...}` syntax (not `$...`) for variable substitution in Redirect Plus.
+- The `activityKey` value (e.g. `Mod1Act1`) is a custom identifier per assignment that, combined with `courseId` and `userId`, uniquely identifies a student's work.
+
+### Parameters Parsed by the Page
+
+The page reads these query parameters on load via `readCanvasIdentity()`:
+
+- `canvasUserId` / `userId`
+- `loginId` / `login`
+- `sisId`
+- `courseId`
+- `courseName`
+- `contextId`
+- `activityKey`
+- `firstName` / `givenName` / `personGivenName`
+- `lastName` / `familyName` / `personFamilyName`
+
+If no explicit first/last name is provided, the page attempts to parse a name from the `loginId` email address. The first name is displayed in the page heading as `FirstName - Select a room to inspect`.
+
+All parsed values are stored on `document.body.dataset` (invisible to the user) and used when reporting scores.
+
+## Score Reporting Architecture
+
+Score reporting uses a three-part architecture where the Google Apps Script is a **permanent, generic data store** and all business logic lives on GitHub Pages.
+
+### Components
+
+1. **GitHub Pages (`maintenance-demo/index.html`)** — All scoring logic.
+2. **GitHub Pages (`maintenance-demo/reporting-config.js`)** — Endpoint URLs, editable via `git push`.
+3. **Google Apps Script (`Code.gs`)** — Generic sheet store. Receives rows, never needs code changes.
+
+### Google Sheet
+
+- URL: `https://docs.google.com/spreadsheets/d/1lYJl2ziluBctDboHqKLpvqT5mr_8H8738t-eKmJdUxg/edit`
+- Sheet name: "Course 123"
+- Data tab: `results` (created automatically by the script on first write)
+
+### Apps Script Endpoint
+
+The Apps Script is deployed as a web app with access set to **"Anyone"** (no Google account required). It serves two purposes:
+
+- **POST** — Receives a row of score data. If `_keys` and `_columns` parameters are provided, it deletes any existing row matching the key fields before appending the new row. This is a generic upsert-by-delete-and-insert pattern.
+- **GET with `?action=results`** — Returns all rows as a JSON array.
+
+The Apps Script URL is configured in `reporting-config.js`:
+
+```javascript
+window.MAINTENANCE_REPORT_ENDPOINT = '<apps-script-exec-url>';
+window.MAINTENANCE_RESULTS_ENDPOINT = '<apps-script-exec-url>?action=results';
+```
+
+**The Apps Script code is intentionally generic and should never need to change.** If the reporting logic or column structure needs to change, update the client-side JavaScript on GitHub Pages instead.
+
+### Scoring Flow
+
+1. **Page loads** → `prefetchPriorRow()` fetches the student's existing row from the sheet (by `userId + activityKey + courseId`) and caches it in memory.
+2. **Student answers questions** → Score tracked in memory only. Nothing is sent to the server during the quiz.
+3. **Score is sent** when either:
+   - The student **completes all issues** → `sendFinalScore('complete')` fires.
+   - The student **leaves the page** (closes tab, navigates away) → `sendFinalScore('partial')` fires via `visibilitychange` / `pagehide` events.
+4. `sendFinalScore` uses the cached prior row to compute:
+   - `attemptNumber` = previous attempt number + 1
+   - `completedAttempts` = incremented only if `eventType === 'complete'`
+   - `bestPercent` = max of previous best and current percent
+5. The computed row is sent via `navigator.sendBeacon` (reliable during page unload) to the Apps Script, which deletes the old row (if any) and appends the new one.
+
+**Result: exactly one row per student per activity in the sheet**, updated on each visit.
+
+### Score Columns
+
+| Column | Description |
+|--------|-------------|
+| `timestamp` | ISO timestamp of the score submission |
+| `eventType` | `complete` (all issues solved) or `partial` (left early) |
+| `activityKey` | Custom activity identifier (e.g. `Mod1Act1`) |
+| `courseId` | Canvas course ID |
+| `courseName` | Canvas course name |
+| `contextId` | Canvas context ID |
+| `userId` | Canvas user ID |
+| `loginId` | Canvas login email |
+| `sisId` | SIS source ID (if available) |
+| `firstName` | Student first name |
+| `lastName` | Student last name |
+| `attemptNumber` | Which attempt this is (incremented server-side via client logic) |
+| `completedAttempts` | How many attempts were fully completed |
+| `attemptStartedAt` | ISO timestamp when the attempt began |
+| `attemptCompletedAt` | ISO timestamp when the score was sent |
+| `scorePolicy` | Score policy in use (currently `best`) |
+| `bestPercent` | Highest percent across all attempts |
+| `score` | Issues solved this attempt |
+| `maxScore` | Total issues available |
+| `percent` | Score as percentage this attempt |
+| `completedRooms` | Rooms fully completed this attempt |
+| `totalRooms` | Total rooms (currently 3) |
+
+### Test Results Page
+
+A standalone page at `maintenance-demo/test-results.html` fetches and displays all rows from the results endpoint. It includes Refresh, Copy JSON, and Download JSON buttons. This page is for instructor/developer use, not for students.
+
+### Key Design Decisions
+
+- **No reporting URL is exposed in the Canvas redirect URL.** The endpoint lives in `reporting-config.js` on the same host.
+- **The Apps Script is a dumb pipe.** All business logic (attempt counting, best-score tracking, column definitions) lives in the GitHub-hosted JavaScript.
+- **Logic changes require only a `git push`**, not an Apps Script redeployment or URL change.
+- **The prior row is pre-fetched on page load** so that `sendFinalScore` can fire synchronously via `sendBeacon` during page unload without waiting for a network response.
+
 ## Recently Requested Content/UX Decisions
 
 These are intentional and should not be "cleaned up" unless the user asks:
@@ -281,12 +404,16 @@ If someone returns to this project later, read in this order:
 
 1. `PROJECT_HANDOFF.md`
 2. `maintenance-demo/index.html`
-3. `index.html`
-4. `README.md`
+3. `maintenance-demo/reporting-config.js`
+4. `maintenance-demo/test-results.html`
+5. `index.html`
+6. `README.md`
 
 Then decide which branch of work they are touching:
 
 - maintenance/floorplan demo
+- score reporting / Google Sheets integration
+- Canvas LTI / Redirect Plus configuration
 - A&P / quiz / game iframe page
 - Canvas embed markup outside the repo
 
@@ -308,5 +435,8 @@ The repo is currently centered on a polished presentation/demo flow for home mai
 - silly distractor choices
 - responsibility tagging
 - clearer room and overall progress
+- Canvas LTI integration via Redirect Plus for student identity
+- server-backed score reporting to Google Sheets via Apps Script
+- accessibility mode with screen reader support toggle
 
 That is the safest baseline to continue from.
